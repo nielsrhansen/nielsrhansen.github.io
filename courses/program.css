@@ -1,6 +1,6 @@
 
 body {
-    background-color: #FFFFFF;
+    background-color: #F3F3F3;
     font-family: verdana;
     padding: 0 0 0 50px;
     width: 960px;
@@ -14,7 +14,7 @@ a:active {color: #18a9f6;}
 a:visited {color: #18a9f6;}
 
 .weekbox {
-    background-color: #EEEEEE;
+    background-color: #E3E3E3;
     width: 300px;
     height: 350px;
     padding: 5px 5px 5px 5px;
