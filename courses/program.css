@@ -1,0 +1,43 @@
+
+body {
+    background-color: #FFFFFF;
+    font-family: verdana;
+    padding: 0 0 0 50px;
+    width: 960px;
+}
+
+/* Standard links */
+
+a:link {color: #18a9f6; text-decoration: none;}
+a:hover {font-style: italic; color: #18a9f6;}
+a:active {color: #18a9f6;}
+a:visited {color: #18a9f6;}
+
+.weekbox {
+    background-color: #EEEEEE;
+    width: 300px;
+    height: 350px;
+    padding: 5px 5px 5px 5px;
+}
+
+.weekname {
+    text-align: center;
+    font-size: 120%;
+    font-weight: bold;
+    padding: 10px 0px 10px 0px;
+}
+
+.day {
+    font-weight: bold;
+    padding: 5px 0px 5px 0px;
+}
+
+.activity {
+    font-style: italic;
+
+}
+
+.content {
+  padding: 5px 0px 10px 15px;
+
+}
