@@ -38,7 +38,7 @@ To help you get started we read in the data and construct a plot.
 
 ```{r readingData}
 sat <- read.table(
-  "https://nielsrhansen.github.io/courses/regression2016/Exercises/SAT.txt", 
+  "https://nielsrhansen.github.io/courses/regression2016/Data/SAT.txt", 
   header = TRUE)
 ```
 
