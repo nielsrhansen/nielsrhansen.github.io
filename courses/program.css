@@ -37,6 +37,10 @@ a:visited {color: #18a9f6;}
 }
 
 .content {
-  padding: 5px 0px 10px 15px;
+    padding: 5px 0px 10px 15px;
+}
 
+.event {
+    font-style: italic;
+    padding: 0px 0px 10px 15px;
 }
