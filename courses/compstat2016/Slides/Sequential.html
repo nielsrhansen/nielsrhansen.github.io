@@ -145,7 +145,7 @@ rgausFast(10)</pre>
 <pre > [1] -0.67789569  1.14521645  1.39843999  0.04680905 -1.42131797
  [6] -0.25511250  1.11350875 -0.11479537 -0.22645695 -0.09719512</pre>
 
-</article></slide><slide class=''><hgroup><h2>Benchmarking</h2></hgroup><article  id="benchmarking">
+</article></slide><slide class=''><hgroup><h2>Benchmarking</h2></hgroup><article  id="benchmarking" class="build">
 
 <pre class = 'prettyprint lang-r'>library(microbenchmark)
 microbenchmark(rgaus(1), rgausFast(1))</pre>
@@ -171,7 +171,7 @@ microbenchmark(rgaus(1), rgausFast(1))</pre>
 <ul class = 'build'>
 <li><p>If the coordinates are independent, we can simulate them marginally.</p></li>
 <li><p>For the multivariate normal distribution \(\mathcal{N}(\mu, \Sigma)\) simulation can be done as \(X = C Z + \mu\), with \(Z \sim \mathcal{N}(0, I)\) and \(\Sigma = CC^T\).</p></li>
-<li><p>Rejection and importance sampling can be used, but choosing a good envelope becomes increasingly difficult as \(k\) increases.</p></li>
+<li><p>Rejection and importance sampling can be used, but choosing a good envelope becomes increasingly difficult as \(n\) increases.</p></li>
 </ul>
 
 </article></slide><slide class=''><hgroup><h2>Sequential sampling</h2></hgroup><article  id="sequential-sampling" class="build">
@@ -256,7 +256,7 @@ microbenchmark(rgaus(1), rgausFast(1))</pre>
 <p>If the distribution of \(F_t(x, U_t)\) has density \(f_t(\cdot \mid x)\), the density of \(X_0, \ldots, X_t\) is \[
 \begin{aligned}
 f_t(x_{0:t}) &amp; = f_0(x_0) f_1(x_1\mid x_0) \ldots f_t(x_t \mid x_{t-1}) \\
-&amp; = f_t(x_{0:(t-1)}) f_t(x_t \mid x_{t-1}),
+&amp; = f_{t-1}(x_{0:(t-1)}) f_t(x_t \mid x_{t-1}),
 \end{aligned}
 \] where \(f_0\) is the density of \(X_0\).</p>
 
