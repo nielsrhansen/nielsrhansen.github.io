@@ -1,0 +1,203 @@
+<html>
+<head>
+<title>R course, DONG, 2016</title>
+
+<link href="DONG.css" rel="stylesheet" type="text/css" media="screen, print" />
+
+</meta>
+
+</head>
+
+<body>
+<a NAME="main"></a>
+
+<h1 align=center> R course, DONG, 2016 </h1>
+
+<table>
+  <tr>
+    <td valign=top>
+      
+    <div class="menutitle"> Thursday, December 8</div>
+    
+    <div class="textbox">
+      <table>
+	<tr>
+	  <td align=left>
+	    8.30-10.00:
+	  </td>
+	  <td align = left>
+	    Introduction to R and RStudio
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise1.pdf">Exercise</a>
+	  </td>
+	</tr>
+    
+	<tr>
+	  <td align=left>
+	    10.30-12.00:
+	  </td>
+	  <td align = left>
+	    <a href="Intro.html">Data structures and functions</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise2.pdf">Exercise</a>
+	  </td>
+	</tr>
+  
+	<tr>
+	  <td align=left>
+	    12.30-14.00:
+	  </td>
+	  <td align = left>
+	    <a href="Data.html">Data and tidyverse</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise3A.pdf">Exercise</a>
+	  </td>
+	</tr>
+    
+	<tr>
+	  <td align=left>
+	    14.30-16.00:
+	  </td>
+	  <td align = left>
+	    <a href="RMarkdown.html">R Markdown and pipe</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise3B.pdf">Exercise</a>
+	  </td>
+	</tr>
+      </table>
+    </div>
+    
+    </td>
+    <td valign=top>
+  
+    <div class="menutitle"> Friday, December 9</div>
+
+       <div class="textbox">
+      <table>
+	<tr>
+	  <td align=left>
+	    8.30-10.00:
+	  </td>
+	  <td align = left>
+	    <a href="Functions.html">Functions, environments and objects</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise4.pdf">Exercise</a>
+	  </td>
+	</tr>
+    
+	<tr>
+	  <td align=left>
+	    10.30-12.00:
+	  </td>
+	  <td align = left>
+	    <a href="ggplot2.html">More ggplot2</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    <a href="Exercise3C.pdf">Exercise</a>
+	  </td>
+	</tr>
+  
+	<tr>
+	  <td align=left>
+	    12.30-14.00:
+	  </td>
+	  <td align = left>
+	    Shiny
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    Open exercise
+	  </td>
+	</tr>
+    
+	<tr>
+	  <td align=left>
+	    14.30-16.00:
+	  </td>
+	  <td align = left>
+	    Open exercise
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	  </td>
+	  <td>
+	    Presentations
+	  </td>
+	</tr>
+      </table>
+    </div>
+
+    </td>
+  </tr>
+</table>
+
+<div class="menutitle">Additional resources</div>
+
+<div class="textbox">
+
+
+  Online documentation:
+  
+  <ul>
+    <li> <a href="http://rmarkdown.rstudio.com/articles.html">R Markdown articles</a>
+    <li> <a href="http://yihui.name/knitr/"> Knitr </a>
+    <li> <a href="http://shiny.rstudio.com">Shiny</a> (Tutorials and articles)
+  </ul>
+
+  Great books available online and on print:
+  
+  <ul>
+    <li> <a href="http://r4ds.had.co.nz">R for Data Science</a> (The tidyverse)
+    <li> <a href="http://adv-r.had.co.nz">Advanced R</a> (Programming)
+    <li> <a href="http://r-pkgs.had.co.nz">R package development</a>
+    <li> <a href="http://www.cookbook-r.com/"> Cookbook for R </a> (See Graph chapter for ggplot2)
+  </ul>
+
+</div>
+
+
+
+
+
+<div id="footer">  
+<hr WIDTH="100%">
+  &copy Niels Richard Hansen &#160;&#160;&#160;
+  <a href="#" onclick="this.href='mai' + 'lto:' + 'Niels.R.Hansen' + '@' +
+  'math.ku.dk' ; return true;">Email</a> 
+</div>
+
+</body>  
+</html>
