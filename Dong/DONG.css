@@ -1,203 +1,273 @@
-<html>
-<head>
-<title>R course, DONG, 2016</title>
+hr {
+    background-color: #000000;
+    border: 0 none;
+    color: #000000;
+    height: 1px;
+}
 
-<link href="DONG.css" rel="stylesheet" type="text/css" media="screen, print" />
+body {
+/*    background-color: #999595;*/
+    background-color: #FFFFFF;
+/*    font-family: Palatino;*/
+    font-family: verdana;
+    padding: 0 0 0 50px;
+    width: 960px;
+}
 
-</meta>
+/* Standard links */
 
-</head>
+a:link {color: #000000; text-decoration: none;}
+a:hover {color: #000000;}
+a:active {color: #000000;}
+a:visited {color: #000000;}
 
-<body>
-<a NAME="main"></a>
+/* Button links */
 
-<h1 align=center> R course, DONG, 2016 </h1>
+a.button:link {color: #FFFFFF; text-decoration: none;}
+a.button:hover {color: #FFFFFF;}
+a.button:active {color: #FFFFFF;}
+a.button:visited {color: #FFFFFF;}
 
-<table>
-  <tr>
-    <td valign=top>
-      
-    <div class="menutitle"> Thursday, December 8</div>
-    
-    <div class="textbox">
-      <table>
-	<tr>
-	  <td align=left>
-	    8.30-10.00:
-	  </td>
-	  <td align = left>
-	    Introduction to R and RStudio
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise1.pdf">Exercise</a>
-	  </td>
-	</tr>
-    
-	<tr>
-	  <td align=left>
-	    10.30-12.00:
-	  </td>
-	  <td align = left>
-	    <a href="Intro.html">Data structures and functions</a>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise2.pdf">Exercise</a>
-	  </td>
-	</tr>
-  
-	<tr>
-	  <td align=left>
-	    12.30-14.00:
-	  </td>
-	  <td align = left>
-	    <a href="Data.html">Data and tidyverse</a>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise3A.pdf">Exercise</a>
-	  </td>
-	</tr>
-    
-	<tr>
-	  <td align=left>
-	    14.30-16.00:
-	  </td>
-	  <td align = left>
-	    <a href="RMarkdown.html">R Markdown and pipe</a>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise3B.pdf">Exercise</a>
-	  </td>
-	</tr>
-      </table>
-    </div>
-    
-    </td>
-    <td valign=top>
-  
-    <div class="menutitle"> Friday, December 9</div>
+/* Text links */
 
-       <div class="textbox">
-      <table>
-	<tr>
-	  <td align=left>
-	    8.30-10.00:
-	  </td>
-	  <td align = left>
-	    <a href="Functions.html">Functions, environments and objects</a>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise4.pdf">Exercise</a>
-	  </td>
-	</tr>
-    
-	<tr>
-	  <td align=left>
-	    10.30-12.00:
-	  </td>
-	  <td align = left>
-	    <a href="ggplot2.html">More ggplot2</a>
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    <a href="Exercise3C.pdf">Exercise</a>
-	  </td>
-	</tr>
-  
-	<tr>
-	  <td align=left>
-	    12.30-14.00:
-	  </td>
-	  <td align = left>
-	    Shiny
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    Open exercise
-	  </td>
-	</tr>
-    
-	<tr>
-	  <td align=left>
-	    14.30-16.00:
-	  </td>
-	  <td align = left>
-	    Open exercise
-	  </td>
-	</tr>
-	<tr>
-	  <td>
-	  </td>
-	  <td>
-	    Presentations
-	  </td>
-	</tr>
-      </table>
-    </div>
+.textbox a:link {font-weight: bold; color: #48d4f6; text-decoration: none;}
+.textbox a:hover {font-weight: bold; color: #48d4f6;}
+.textbox a:active {font-weight: bold; color: #48d4f6;}
+.textbox a:visited {font-weight: bold; color: #48d4f6;}
 
-    </td>
-  </tr>
-</table>
+#footer a:link {color: #48d4f6; text-decoration: none;}
+#footer a:hover {color: #48d4f6;}
+#footer a:active {color: #48d4f6;}
+#footer a:visited {color: #48d4f6;}
 
-<div class="menutitle">Additional resources</div>
+.head a:link {color: #48d4f6; text-decoration: none;}
+.head a:hover {color: #48d4f6;}
+.head a:active {color: #48d4f6;}
+.head a:visited {color: #48d4f6;}
 
-<div class="textbox">
+/* Menu links */
+
+.menu a:link {    
+    position: relative;
+    font-size: 130%;
+    font-weight: bold;
+    display: block;
+    float: left;
+    color: #000000;
+    width: 200px;
+    text-align: center;
+    text-decoration: none;
+    background-color:#FFFFFF;
+    padding: 5px 5px 5px 5px;
+    margin: 0 2px 0 2px;
+    z-index: 1;
+}
+
+.menu a:hover {
+    font-style: italic;
+}
+
+.menu a:active {    
+    font-style: italic;
+}
 
 
-  Online documentation:
-  
-  <ul>
-    <li> <a href="http://rmarkdown.rstudio.com/articles.html">R Markdown articles</a>
-    <li> <a href="http://yihui.name/knitr/"> Knitr </a>
-    <li> <a href="http://shiny.rstudio.com">Shiny</a> (Tutorials and articles)
-  </ul>
+/* Big menu links */
 
-  Great books available online and on print:
-  
-  <ul>
-    <li> <a href="http://r4ds.had.co.nz">R for Data Science</a> (The tidyverse)
-    <li> <a href="http://adv-r.had.co.nz">Advanced R</a> (Programming)
-    <li> <a href="http://r-pkgs.had.co.nz">R package development</a>
-    <li> <a href="http://www.cookbook-r.com/"> Cookbook for R </a> (See Graph chapter for ggplot2)
-  </ul>
+.bigmenu a:link {
+    font-style: italic;
+    z-index: 2;
+}
 
-</div>
+.bigmenu a:active {
+   
+}
+
+.bigmenu a:visited {
+}
 
 
+span.listitem {
+    font-weight: bold;
+    font-size: 110%;
+}
+span.listcontent {
+    padding: 0 0 0 10px;
+}
+
+.menutitle {
+    margin: 10px 50px 10px 10px;
+
+    position: relative;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.box {
+    position: relative;
+/*  background-color: #D8D5D4; */
+    background-color: #FFFFFF; 
+    padding: 5px 5px 5px 5px;
+    z-index: 3;
+}
+
+.button {
+    color: #FFFFFF;
+    position: relative;
+    display: block;
+    width: 200px;
+    text-align: center;
+    padding: 10px 0px 10px 0px;
+    margin: 10px 0px 10px 100px;
+    -moz-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 4px; 
+    -moz-border-radius: 4px; 
+    -webkit-border-radius: 4px;
+    z-index: 4;
+    border-top: 1px solid #96d1f8;
+    background: #9bd1f5;
+    background: -webkit-gradient(linear, left top, left bottom, from(#5b95c7), to(#9bd1f5));
+    background: -webkit-linear-gradient(top, #5b95c7, #9bd1f5);
+    background: -moz-linear-gradient(top, #5b95c7, #9bd1f5);
+    background: -ms-linear-gradient(top, #5b95c7, #9bd1f5);
+    background: -o-linear-gradient(top, #5b95c7, #9bd1f5);
+    -pie-background: linear-gradient(top, #5b95c7, #9bd1f5);
+    behavior: url(../PIE.htc);
+}
 
 
+.head {
+    position: relative;
+    right: -20px;
+    top: 10px;
+    font-weight: bold;
+    font-size: 120%;
+    width: 500px;
+    text-align: left;
+}
 
-<div id="footer">  
-<hr WIDTH="100%">
-  &copy Niels Richard Hansen &#160;&#160;&#160;
-  <a href="#" onclick="this.href='mai' + 'lto:' + 'Niels.R.Hansen' + '@' +
-  'math.ku.dk' ; return true;">Email</a> 
-</div>
 
-</body>  
-</html>
+.homemenu {
+    margin: 20px 0 20px 25px;
+    background-color: #FFFFFF;
+    width: 400px;
+    text-align: left;
+    font-size: 90%;
+    height: 250px;
+}
+
+.textbox {
+    position: relative;
+    margin: 10px 10px 10px 10px;
+    background-color: #FFFFFF;
+    width: 100%;
+    text-align: left;
+    font-size: 110%;
+}
+
+.main {
+    background-color: #FFFFFF;
+    margin: 25px 25px 0px 25px;
+    width: 840px;
+    text-align: left;
+    font-size: 110%;
+}
+
+.topfig1 {
+    position: relative;
+    top: 20px;
+    left: 20px;
+    margin-bottom: 30px;
+}
+
+.topfig2 {
+    position: relative;
+    top: 10px;
+    left: 120px;
+}
+
+.topfig2 img {
+    position: relative;
+    -moz-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5); 
+}
+
+.topfig1 img {
+    position: relative;
+    -moz-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5); 
+}
+
+.menurow {
+    position: relative;
+    top: 25px;
+/*    left: 132px;*/
+    width: 902px;
+    height: 50px;
+    text-align: right;
+}
+
+.menuitem {
+    padding: 0 10px 0 100px;
+}
+
+.fader {
+    background: black;
+    opacity: .5;
+    -moz-opacity: .5;
+    filter: alpha(opacity=50);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 5;
+    transition: opacity 2s;
+    -moz-transition: opacity 2s;
+    -webkit-transition: opacity 2s;
+}
+
+.fader:hover {
+    opacity: .25;
+    -moz-opacity: 0.25;
+    filter: alpha(opacity=25);
+}
+
+.popbox {
+    position: absolute;
+    background-color: #FFFFFF;
+    border: 4px solid black;
+    margin: 0 0 40px 40px;
+    width: 860px;
+    height: 600px;
+    top: 80px;
+    left: 30px;
+    text-align: left;
+    font-size: 15px;
+    -moz-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    behavior: url(../PIE.htc);
+}
+
+.popbox iframe {
+    width: 856px;
+    height: 596px;
+}
+
+
+/* --- Footer --- */
+
+#footer {
+    position: relative;
+    font-size: 80%;
+    clear: both;
+    text-align: center;
+    margin: 30px 0 0 0;   
+    width: 900px;
+}
