@@ -25,7 +25,7 @@ library(tidyverse)
 theme_set(theme_bw())
 ```
 
-## Exercise 1A. Working with an R Markdown document {#1A}
+## Exercise 1A. Working with an R Markdown document {#E1A}
 
 ### Reading data
 
@@ -74,7 +74,7 @@ filter(Supermarket, is.na(DiscountSEK)) %>%
 * Construct a new variable `NormalPrice` containing the price without discount.
 * If time permits, count how many observations that fall in each category and construct a cross-tabulation between `Category` and `Week`.
 
-## Exercise 1B. Basic plotting of data using geoms and aesthetics {#1B}
+## Exercise 1B. Basic plotting of data using geoms and aesthetics {#E1B}
 
 The following code chunk subsets the data to five specific items. They all belong to the 
 category *Fisk & Skaldjur*.
@@ -100,7 +100,7 @@ For the last question above, you may want to experiment with the following:
 * Replace `geom_point` by `geom_boxplot` and the `color` aesthetic with the `fill` aesthetic. For
 this to work, it is also necessary to convert `Week` into a factor by `factor(Week)`.
 
-## Exercise 1C: Using dplyr and ggplot in combination {#1C}
+## Exercise 1C: Using dplyr and ggplot in combination {#E1C}
 
 We first construct two data tables from the full data set. 
 
@@ -127,7 +127,7 @@ with the ggplot2 `+` concatenation of commands?
 * Use `facet_grid` to get all plots for all combinations of week and item in `fishItems`.
 * Let the second axis be "free", so that it may differ for different items. Try square-root transforming the second axis as well. 
 
-## Exercise 1D: Advanced customization {#1D}
+## Exercise 1D: Advanced customization {#E1D}
 
 In this exercise, you are not asked to make new chunks, but instead to modify 
 the existing chunks and chunk options to customize the results.  

@@ -155,8 +155,8 @@ $(document).ready(function () {
 <pre><code>## filter(): dplyr, stats
 ## lag():    dplyr, stats</code></pre>
 <pre class="r"><code>theme_set(theme_bw())</code></pre>
-<div id="exercise-1a.-working-with-an-r-markdown-document-1a" class="section level2">
-<h2>Exercise 1A. Working with an R Markdown document {#1A}</h2>
+<div id="E1A" class="section level2">
+<h2>Exercise 1A. Working with an R Markdown document</h2>
 <div id="reading-data" class="section level3">
 <h3>Reading data</h3>
 <p>The data for this exercise is available from</p>
@@ -187,8 +187,8 @@ $(document).ready(function () {
 </ul>
 </div>
 </div>
-<div id="exercise-1b.-basic-plotting-of-data-using-geoms-and-aesthetics-1b" class="section level2">
-<h2>Exercise 1B. Basic plotting of data using geoms and aesthetics {#1B}</h2>
+<div id="E1B" class="section level2">
+<h2>Exercise 1B. Basic plotting of data using geoms and aesthetics</h2>
 <p>The following code chunk subsets the data to five specific items. They all belong to the category <em>Fisk &amp; Skaldjur</em>.</p>
 <pre class="r"><code>fishItems &lt;- c(&quot;7311170031149&quot;, &quot;7311171002704&quot;, &quot;7311171003510&quot;, &quot;7340011391968&quot;, &quot;7393835042264&quot;)
 Fish &lt;- filter(Supermarket, ItemId %in% fishItems)</code></pre>
@@ -209,8 +209,8 @@ Fish &lt;- filter(Supermarket, ItemId %in% fishItems)</code></pre>
 <li>Replace <code>geom_point</code> by <code>geom_boxplot</code> and the <code>color</code> aesthetic with the <code>fill</code> aesthetic. For this to work, it is also necessary to convert <code>Week</code> into a factor by <code>factor(Week)</code>.</li>
 </ul>
 </div>
-<div id="exercise-1c-using-dplyr-and-ggplot-in-combination-1c" class="section level2">
-<h2>Exercise 1C: Using dplyr and ggplot in combination {#1C}</h2>
+<div id="E1C" class="section level2">
+<h2>Exercise 1C: Using dplyr and ggplot in combination</h2>
 <p>We first construct two data tables from the full data set.</p>
 <pre class="r"><code>storeSize &lt;- Supermarket %&gt;% group_by(StoreId) %&gt;% 
   summarize(size = median(NormalSale))
@@ -228,8 +228,8 @@ Fish &lt;- filter(Supermarket, CatId == &quot;423230&quot;)</code></pre>
 <li><p>Let the second axis be “free”, so that it may differ for different items. Try square-root transforming the second axis as well.</p></li>
 </ul>
 </div>
-<div id="exercise-1d-advanced-customization-1d" class="section level2">
-<h2>Exercise 1D: Advanced customization {#1D}</h2>
+<div id="E1D" class="section level2">
+<h2>Exercise 1D: Advanced customization</h2>
 <p>In this exercise, you are not asked to make new chunks, but instead to modify the existing chunks and chunk options to customize the results.</p>
 <ul>
 <li>Clean your R Markdown document, check the organization of chunks and give them names.</li>
