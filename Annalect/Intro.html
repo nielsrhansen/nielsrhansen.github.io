@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data and tidyverse</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <meta name="date" content="2017-06-22" />
+    <link href="Intro_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <script src="Intro_files/htmlwidgets-0.8/htmlwidgets.js"></script>
+    <script src="Intro_files/jquery-1.12.4/jquery.min.js"></script>
+    <script src="Intro_files/datatables-binding-0.2/datatables.js"></script>
+    <link href="Intro_files/dt-core-1.10.12/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="Intro_files/dt-core-1.10.12/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="Intro_files/dt-core-1.10.12/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data and tidyverse
+### Niels Richard Hansen
+### June 22, 2017
+
+---
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+
+## Tidyverse packages 
+
+
+```r
+library("tidyverse")
+```
+
+```
+Loading tidyverse: ggplot2
+Loading tidyverse: tibble
+Loading tidyverse: tidyr
+Loading tidyverse: readr
+Loading tidyverse: purrr
+Loading tidyverse: dplyr
+```
+
+```
+Conflicts with tidy packages ----------------------------------------------
+```
+
+```
+filter(): dplyr, stats
+lag():    dplyr, stats
+```
+
+The tidyverse package loads a number of R packages that has recently been developed
+to support a clearner, more efficient and more coherent framework for data handling and 
+data transformation in R. 
+
+---
+
+## Core tidyverse packages
+
+
+<div id="htmlwidget-2acf43b5988f03b18ca0" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2acf43b5988f03b18ca0">{"x":{"filter":"none","data":[["tibble","dplyr","tidyr","readr","purr","ggplot2"],["A data structure for tabular data","Rearrange, filter, transform and join data tibbles","Gather or spread tables to make them tidy","Read and write tabular data","Functional programming","Graphics"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Package<\/th>\n      <th>Functionality<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"ordering":false,"searching":false,"lengthChange":false,"info":false,"paging":false,"columnDefs":[{"className":"dt-head-left","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## Reading data
+
+
+```r
+## Using the readr package
+traffic &lt;- read_csv("http://math.ku.dk/~richard/Annalect/traffic.csv")
+```
+
+```
+Parsed with column specification:
+cols(
+  `machine name` = col_character(),
+  `user id` = col_integer(),
+  size = col_integer(),
+  time = col_double(),
+  date = col_date(format = ""),
+  month = col_character()
+)
+```
+
+This data set is from a [classical 1995 data set on Boston University WWW data transfers](http://ita.ee.lbl.gov/html/contrib/BU-Web-Client.html).
+
+The `size` column contains sizes of downloaded documents in bytes 
+and the `time` column contains the time in seconds. 
+
+---
+
+## Sorting data
+
+
+```r
+## This is a tibble
+traffic 
+```
+
+```
+# A tibble: 1,143,806 x 6
+  `machine name` `user id`  size     time       date   month
+           &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1           cs21    239799  2313 0.510395 1995-04-12 1995-04
+2           cs21    100378 83789 0.880251 1995-04-12 1995-04
+3           cs21    318055  1558 0.429576 1995-04-12 1995-04
+4           cs21    841773  1806 0.568182 1995-04-12 1995-04
+5           cs21    763037   718 0.323564 1995-04-12 1995-04
+6           cs21    487965  9461 0.780510 1995-04-12 1995-04
+# ... with 1.144e+06 more rows
+```
+
+The data rows appear in the order they were read.
+
+---
+
+## Sorting data
+
+
+```r
+## This is a function call of the `arrange` function with 
+## two arguments. It returns a tibble, which is printed. 
+## It doesn't change data.
+arrange(traffic, size)
+```
+
+```
+# A tibble: 1,143,806 x 6
+  `machine name` `user id`  size  time       date   month
+           &lt;chr&gt;     &lt;int&gt; &lt;int&gt; &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1           cs21    665087     0     0 1995-04-12 1995-04
+2           cs21    294759     0     0 1995-04-12 1995-04
+3           cs21    634822     0     0 1995-04-12 1995-04
+4           cs21    209692     0     0 1995-04-12 1995-04
+5           cs21    854335     0     0 1995-04-12 1995-04
+6           cs21    883107     0     0 1995-04-12 1995-04
+# ... with 1.144e+06 more rows
+```
+
+The data can be sorted according to one or more columns.
+
+---
+
+## Sorting data
+
+
+```r
+arrange(traffic, `machine name`, desc(size))
+```
+
+```
+# A tibble: 1,143,806 x 6
+  `machine name` `user id`     size     time       date   month
+           &lt;chr&gt;     &lt;int&gt;    &lt;int&gt;    &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1         animal     27502 20135435 428.8765 1995-03-20 1995-03
+2         animal    207108 11311562 158.4130 1995-03-20 1995-03
+3         animal     77479  9334446 131.3229 1995-02-13 1995-02
+4         animal    157539  5785988 176.2018 1995-04-02 1995-04
+5         animal    172089  4742897 135.4516 1995-04-02 1995-04
+6         animal    141664  4742880 527.6279 1995-03-15 1995-03
+# ... with 1.144e+06 more rows
+```
+
+Use `desc` to sort in descending order. 
+
+---
+
+## Filtering
+
+
+```r
+## The result of calling `filter` is kept by assigning
+## it to something.
+traffic &lt;- filter(traffic, size &gt; 0)
+traffic  ## Now the data set has been changed
+```
+
+```
+# A tibble: 290,275 x 6
+  `machine name` `user id`  size     time       date   month
+           &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1           cs21    239799  2313 0.510395 1995-04-12 1995-04
+2           cs21    100378 83789 0.880251 1995-04-12 1995-04
+3           cs21    318055  1558 0.429576 1995-04-12 1995-04
+4           cs21    841773  1806 0.568182 1995-04-12 1995-04
+5           cs21    763037   718 0.323564 1995-04-12 1995-04
+6           cs21    487965  9461 0.780510 1995-04-12 1995-04
+# ... with 2.903e+05 more rows
+```
+
+--
+
+Filtering requires one or more *logical predicates* like `size &gt; 0`. These
+are expressions in terms of columns that evaluate to either `TRUE` or `FALSE`. 
+
+---
+
+## Combining filters
+
+
+```r
+filter(traffic, `machine name` != "cs21" &amp; size &gt; 200000)
+```
+
+```
+# A tibble: 2,397 x 6
+  `machine name` `user id`   size     time       date   month
+           &lt;chr&gt;     &lt;int&gt;  &lt;int&gt;    &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1           cs17    798848 225040 13.63997 1995-04-07 1995-04
+2           cs20    588592 426979 46.83814 1995-04-10 1995-04
+3           cs20    577109 635865 42.89764 1995-04-20 1995-04
+4           cs20    634311 212869 18.82561 1995-04-20 1995-04
+5           cs20     81176 240380 22.74180 1995-04-20 1995-04
+6           cs20    647825 212536 86.34142 1995-04-22 1995-04
+# ... with 2,391 more rows
+```
+
+
+Comparisons: ` == `, ` != `, ` &lt; `, ` &gt; `, ` &lt;= `, ` &gt;= `, ` %in% `, ` is.na `. 
+
+--
+
+Logical operations: `!` (not), `|` (or), `&amp;` (and).  
+
+---
+
+## Selection
+
+
+```r
+traffic &lt;- select(traffic, `machine name`, size, time)
+traffic
+```
+
+```
+# A tibble: 290,275 x 3
+  `machine name`  size     time
+           &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;
+1           cs21  2313 0.510395
+2           cs21 83789 0.880251
+3           cs21  1558 0.429576
+4           cs21  1806 0.568182
+5           cs21   718 0.323564
+6           cs21  9461 0.780510
+# ... with 2.903e+05 more rows
+```
+
+We will only work with three of the columns for now. 
+
+---
+
+## Transformation with `mutate` 
+
+
+```r
+traffic &lt;- mutate(traffic, speed = size / time)
+traffic
+```
+
+```
+# A tibble: 290,275 x 4
+  `machine name`  size     time     speed
+           &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1           cs21  2313 0.510395  4531.784
+2           cs21 83789 0.880251 95187.623
+3           cs21  1558 0.429576  3626.832
+4           cs21  1806 0.568182  3178.559
+5           cs21   718 0.323564  2219.035
+6           cs21  9461 0.780510 12121.562
+# ... with 2.903e+05 more rows
+```
+
+New columns with transformed data can be added and existing columns can be modified 
+by `mutate`. 
+
+--
+
+Use `transmute` to keep the transformed columns only. 
+
+---
+
+## Transformation with `mutate` 
+
+
+```r
+traffic &lt;- mutate(traffic, 
+                  slow = ifelse(speed &lt; 150, "Yes", "No"))
+arrange(traffic, desc(speed))
+```
+
+```
+# A tibble: 290,275 x 5
+  `machine name`    size     time   speed  slow
+           &lt;chr&gt;   &lt;int&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;
+1           cs18 2691689 0.833677 3228695    No
+2           pooh 3047343 1.164182 2617583    No
+3      sylvester 1488451 0.674748 2205936    No
+4           pooh 2613023 1.288713 2027622    No
+5         donald 2613023 1.325825 1970866    No
+6         fozzie 2613023 1.454547 1796451    No
+# ... with 2.903e+05 more rows
+```
+
+---
+
+## Counting
+
+
+```r
+count(traffic, `machine name`, slow)
+```
+
+```
+Source: local data frame [74 x 3]
+Groups: machine name [?]
+
+# A tibble: 74 x 3
+  `machine name`  slow     n
+           &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+1         animal    No  7067
+2         animal   Yes   325
+3         beaker    No 11462
+4         beaker   Yes   457
+5           bugs    No  9373
+6           bugs   Yes   590
+# ... with 68 more rows
+```
+
+Tabulation of categorical variables.
+
+---
+
+## Counting
+
+
+```r
+count(traffic, is.na(time))
+```
+
+```
+# A tibble: 1 x 2
+  `is.na(time)`      n
+          &lt;lgl&gt;  &lt;int&gt;
+1         FALSE 290275
+```
+
+No missing values for this variable!
+
+---
+
+## Chaining operations
+
+
+```r
+count(traffic, `machine name`) %&gt;% 
+  arrange(n)
+```
+
+```
+# A tibble: 37 x 2
+  `machine name`     n
+           &lt;chr&gt; &lt;int&gt;
+1           cs18  3814
+2           cs20  4764
+3          kanga  5076
+4          pluto  5253
+5         minnie  5450
+6           cs17  5847
+# ... with 31 more rows
+```
+
+Two or more function calls can be evaluated sequentially using the *pipe operator*:
+`%&gt;%`. 
+
+--
+
+This is syntactic sugar that makes nesting of function calls readable while 
+avoiding intermediate variables.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false,
+"touch": true
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

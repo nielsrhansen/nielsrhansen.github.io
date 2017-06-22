@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reproducible analysis</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <meta name="date" content="2017-06-22" />
+    <link href="Reproduce_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Reproducible analysis
+### Niels Richard Hansen
+### June 22, 2017
+
+---
+
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+
+---
+
+## What's R Markdown?
+
+A format for integration of code and text consisting of
+
+* a *YAML* header 
+* a dialect of *markdown* (very simple text formatting syntax)
+* and *chunks* of R code (alternative languages possible)
+
+--
+
+An R Markdown document is processed by
+
+* the *knitr* engine, which evaluates code and inserts results
+* the *pandoc* converter for producing the desired output format
+
+
+---
+
+## What's the purpose of R Markdown? 
+
+- .large[Automatic report generation]
+  + gives a log file of your work
+  + useful for printed and online distribution of periodic reports
+  + can contain [interactive components](http://rmarkdown.rstudio.com/authoring_shiny.html)
+--
+
+- .large[Structured documentation]
+  + and structured coding 
+  + a single document keeps track of code, output and documentation
+--
+
+- .large[Reproducible analysis]
+  + avoid manual and interactive analysis
+  + recreate earlier results exactly
+  + modify earlier analyses easily
+--
+
+- .large[Versatile output from a single format]
+  + avoid spending time on manually reformatting text and results to different formats
+--
+
+- .large[Supports a cache system to avoid recomputations]
+  + avoid to manually control computation order 
+
+---
+
+## Many output formats from one input file 
+
+&lt;img src="RMarkdownOutputFormats.png" width="450" style="display: block; margin: auto;" /&gt;
+
+---
+
+## The process behind R Markdown
+
+&lt;img src="RMarkdownFlow.png" width="750" style="display: block; margin: auto;" /&gt;
+
+This is usually hidden from the user when using RStudio. Just click the `Knit` button or press Cmd + Shift + K (Mac) or 
+Ctrl + Shift + K (Windows/Linux). 
+
+--
+
+Depending on the chosen output format the result will open in a browser, 
+in Word or in the pdf viewer. 
+
+--
+
+The *knitr* (knit R) package was based conceptually on the R functions *Sweave* and *Stangle* (S weave and S tangle), which again 
+was based on [literate programming](https://en.wikipedia.org/wiki/Literate_programming) as invented and promoted by Donald Knuth.
+
+---
+
+## R Markdown is useful for
+
+- .large[Pipelines]
+
+  + for data analysis
+
+--
+
+- .large[Teaching]
+  + and presentations
+  
+--
+
+### R Markdown is less useful for
+
+- .large[Software development]
+  
+  + use R packages instead
+
+--
+
+- .large[Batch processing]
+  + use R scripts instead
+  
+---
+
+## Working with R Markdown 
+
+Work related to R Markdown goes into
+
+- control of output globally via the YAML header and global *chunk options*
+--
+
+- control of output via individual *chunk options*
+--
+
+- customization of figures
+
+--
+
+And then, of course, the R programming and documentation writing.
+
+---
+
+## Customization of figures
+
+
+
+
+
+
+```r
+p &lt;- ggplot(trafficSum, aes(x = speedMed, y = sizeMed, size = n)) + 
+  geom_point() + geom_smooth(method = "lm", show.legend = FALSE) 
+p
+```
+
+&lt;img src="Reproduce_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Customization of figures, labels
+
+
+```r
+p &lt;- p + xlab("Median size (byte)") + 
+  ylab("Median speed (byte / s)") + 
+  scale_size("Number of downloads")
+p
+```
+
+&lt;img src="Reproduce_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Customization of legends
+
+
+```r
+p + theme(legend.position = "top")
+```
+
+&lt;img src="Reproduce_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Updating the global theme
+
+
+```r
+theme_update(legend.position = "top")
+p
+```
+
+&lt;img src="Reproduce_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Example
+
+The [govstyle](https://github.com/ukgovdatascience/govstyle) R package was developed
+streamlining statistics report generation for [UK Government Digital Service](https://gdsdata.blog.gov.uk).
+
+--
+
+It helps replace this
+
+&lt;img src="old.png" width="750" style="display: block; margin: auto;" /&gt;
+
+--
+
+by this
+
+&lt;img src="new.png" width="450" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Example
+
+The package constructs a theme and other graphics customizations to get
+UK official figures like 
+
+&lt;img src="govExample.png" width="650" style="display: block; margin: auto 0 auto auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false,
+"touch": true
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

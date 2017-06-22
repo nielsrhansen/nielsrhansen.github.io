@@ -1,0 +1,143 @@
+---
+title: 'Exercise 1: Supermarket data'
+author: "??YOUR NAME??"
+date: "June 22, 2017"
+output: 
+  html_document:
+    theme: sandstone
+    code_folding: show
+---
+
+The *Data Wrangling Cheat Sheet* and the *Data Visualization Cheat Sheet* may be helpful. 
+
+This exercise is divided into four parts. The first part is on importing data and getting 
+acquainted with the use of an R Markdown document and R chunks for writing R code. The 
+second part is on using ggplot2 for graphics. The third part is on using some more advanced
+features from the dplyr package for working with data in R. The last part is 
+on the customization of the report and the output of chunks. 
+
+This document is available as the file `Exercise_1_Data.Rmd` as well as the `Exercise_1_Data.html`. 
+You should start by opening the Rmd-file in RStudio. If you then click the *Knit* button, you will 
+get the HTML result shown in the Viewer pane in RStudio. 
+
+```{r init}
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Exercise 1A. Working with an R Markdown document {#1A}
+
+### Reading data
+
+The data for this exercise is available from 
+
+[http://math.ku.dk/~richard/Annalect/Supermarket.txt](http://math.ku.dk/~richard/Annalect/Supermarket.txt)
+
+* Start by importing this data set using RStudio. You can either do this via the *Import Dataset* button
+that you find in the Environment pane, or from the file menu. Either way, this file is a CSV file. 
+* Before importing the data, change the columns containing the ItemId and CatId from integer to character,
+and the Week number from character to integer. Note the Code Preview. Highlight and copy the code before clicking on *Import*.
+
+Once you have imported your data set, it appears in your Global Environment (the Environment pane) 
+as *Supermarket*. If you click on the small table icon, you get a preview of the data. 
+
+* Now paste the code that you copied before into the empty code chunk below for reading in the supermarket data. Before you do anything else, delete the line `View(Supermarket)` from the pasted code.
+
+```{r reading_data, cache=TRUE}
+## This is an empty code chunk. 
+```
+
+When you read in a data set using the `read_csv` function from the `readr` package, you will get a 
+data table called a *tibble* in R. The chunk above has a cache option so that the data set is not read in
+repeatedly from the url. 
+
+The data set contains sales for a major supermarket chain in Sweden from the first 12 weeks of 2007. Most 
+variable names are self-explanatory. The four marketing variables are indicators of whether the different marketing 
+strategies have been used. The variable `NormalSale` is the expected (seasonally adjusted) number of sold items.
+The variable `TotalSale` is the actual number of items sold. 
+
+### Cleaning, filtering and transforming data
+
+This first code chunk counts the number of observations with `DiscountSEK` missing. Once you have read in 
+the data, you can evaluate it in the R console by pressing the small "play" button to the right of the chunk. 
+Start by evaluating the very first code chunk in this document called `init`. It will load the tidyverse 
+packages. As you go through the exercise, remove the chunk option `eval=FALSE` from the chunks in this document.
+
+```{r na_discount, eval=FALSE}
+filter(Supermarket, is.na(DiscountSEK)) %>% 
+  count()
+```
+
+* What is the keyboard shortcut for evaluating a chunk?
+* Change the code so that it counts the number of observations with `DiscountSEK` either negative or missing.
+* Insert a new chunk where you discard all observations with a price less than 1 SEK and replace negative and missing values of DiscountSEK by 0 for the remaining observations. 
+* Construct a new variable `NormalPrice` containing the price without discount.
+* If time permits, count how many observations that fall in each category and construct a cross-tabulation between `Category` and `Week`.
+
+## Exercise 1B. Basic plotting of data using geoms and aesthetics {#1B}
+
+The following code chunk subsets the data to five specific items. They all belong to the 
+category *Fisk & Skaldjur*.
+
+```{r fisk, eval=FALSE, cache=TRUE}
+fishItems <- c("7311170031149", "7311171002704", "7311171003510", "7340011391968", "7393835042264")
+Fish <- filter(Supermarket, ItemId %in% fishItems)
+```
+
+* Using the `Fish` data, construct a barplot that shows the number of items sold each week.
+* Add a fill aesthetic to distinguish the different items
+* Plot the total sale against the normal sale.  
+* Add a color aesthetic to distinguish the different items. 
+* Add a line with slope 1 and intercept 0 using `geom_abline`. Give an interpretation.
+* Transform both axes using a square root transformation.
+* The relative total sale is `TotalSale / NormalSale`. Plot the relative total sale against the week number,
+still using colors to distinguish the different items.
+
+For the last question above, you may want to experiment with the following:
+
+* Use of a logarithmic second axis.
+* Use of `position = position_jitterdodge(0)` as an argument to `geom_point`.
+* Replace `geom_point` by `geom_boxplot` and the `color` aesthetic with the `fill` aesthetic. For
+this to work, it is also necessary to convert `Week` into a factor by `factor(Week)`.
+
+## Exercise 1C: Using dplyr and ggplot in combination {#1C}
+
+We first construct two data tables from the full data set. 
+
+```{r fishSize, eval = FALSE, cache=TRUE}
+storeSize <- Supermarket %>% group_by(StoreId) %>% 
+  summarize(size = median(NormalSale))
+Fish <- filter(Supermarket, CatId == "423230")
+```
+
+The `storeSize` table contains the stores and a proxy variable constructed 
+so as to quantify the size of the store in terms of median sold items. The 
+`Fish` table contains all observations belonging to the category *Fisk & Skaldjur*.
+
+* Construct a table from `Fish` that contains the number of distinct items sold by each store. 
+* Join that table with the `storeSize` table using `StoreId` as key. 
+* Plot the the number of distinct items against the store size. 
+* Add a linear regression line and smoother to the plot. 
+* Can you write everything above as a single chain of commands blending the pipe operator `%>%` 
+with the ggplot2 `+` concatenation of commands?
+
+* Construct a plot of `NormalSale` against `size` for `ItemId == "7311171003510"` and
+`Week == 9`. (You have to make a join!).
+* Use `facet_wrap` to get all plots for this item and for the different weeks
+* Use `facet_grid` to get all plots for all combinations of week and item in `fishItems`.
+* Let the second axis be "free", so that it may differ for different items. Try square-root transforming the second axis as well. 
+
+## Exercise 1D: Advanced customization {#1D}
+
+In this exercise, you are not asked to make new chunks, but instead to modify 
+the existing chunks and chunk options to customize the results.  
+
+* Clean your R Markdown document, check the organization of chunks and give them names. 
+* Change some of the plot axis labels to make them more informative. 
+* Increase the width and height of the last figure above. 
+* Move the color legend for one plot to the top. Then set the global theme 
+option so that the legend is placed above all figures.  
+* Add cache functionality to all chunks via a global option. Use auto dependencies.
+* Add interactive plot / selector of items.
+
+

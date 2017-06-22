@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Working with data</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <meta name="date" content="2017-06-22" />
+    <link href="workData_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Working with data
+### Niels Richard Hansen
+### June 22, 2017
+
+---
+
+
+
+
+
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+
+## What have we learned? 
+
+- .large[Data transformations using the dplyr package]
+
+  + `arrange` for sorting a data set
+  + `filter` and `select` for subsetting a data set
+  + `mutate` and `transmute` for transforming variables
+  + `count` for simple tabulations
+  
+--
+
+- .large[Basic graphics with ggplot2]
+  + mappings of variables to aesthetics using `aes`.
+  + using the `+ geom_xx` syntaxs for barplots (`xx = bar`), scatter plots (`xx = point`) and line plots (`xx = line`)
+
+--
+
+- .large[Chaining operations using the pipe operator ` %&gt;% ` from the magrittr package]
+
+---
+
+## What are we aiming for?
+
+One central objective of data analysis is to break down large data sets to
+- discover patterns
+- find relations
+- explain variation
+
+--
+
+We do that by
+- stratification 
+- visualization
+- and modeling
+
+--
+
+One example of stratification using ggplot2 was shown previously: a line plot was grouped by machine name.
+
+---
+
+## Grouping operations
+
+
+```r
+traffic &lt;- group_by(traffic, `machine name`)
+traffic
+```
+
+```
+Source: local data frame [290,275 x 4]
+Groups: machine name [37]
+
+# A tibble: 290,275 x 4
+  `machine name`  size     time     speed
+           &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1           cs21  2313 0.510395  4531.784
+2           cs21 83789 0.880251 95187.623
+3           cs21  1558 0.429576  3626.832
+4           cs21  1806 0.568182  3178.559
+5           cs21   718 0.323564  2219.035
+6           cs21  9461 0.780510 12121.562
+# ... with 2.903e+05 more rows
+```
+
+The `group_by` function doesn't do much but setting the grouping variable.
+
+---
+
+## Counting by group
+
+
+```r
+count(traffic)
+```
+
+```
+# A tibble: 37 x 2
+  `machine name`     n
+           &lt;chr&gt; &lt;int&gt;
+1         animal  7392
+2         beaker 11919
+3           bugs  9963
+4         bunsen  7108
+5           cs17  5847
+6           cs18  3814
+# ... with 31 more rows
+```
+
+```r
+## Due to the group variable, the result is equivalent to
+## count(traffic, `machine name`)
+```
+
+--
+
+
+```r
+## We keep the count table.
+trafficOrd &lt;- count(traffic)
+```
+
+---
+
+## Summarizing by group
+
+
+```r
+traffic %&gt;% 
+  summarize(mean_size = mean(size)) %&gt;% 
+  arrange(mean_size)
+```
+
+```
+# A tibble: 37 x 2
+  `machine name` mean_size
+           &lt;chr&gt;     &lt;dbl&gt;
+1          kanga  10493.82
+2           huey  11271.00
+3           rooh  11447.63
+4          porky  11790.49
+5         minnie  11843.20
+6          piggy  11901.45
+# ... with 31 more rows
+```
+
+Other summaries are computed using `summarize`. 
+
+---
+
+## Summarizing by group
+
+
+```r
+trafficSum &lt;- traffic %&gt;%
+  summarize(
+    speedMed = median(speed), 
+    sizeMed = median(size),
+    speedHigh = quantile(speed, 0.75),
+    speedLow = quantile(speed, 0.25),
+    sizeHigh = quantile(size, 0.75),
+    sizeLow = quantile(speed, 0.25)
+  )
+```
+
+--
+
+R functions for computing statistical summaries:
+
+- `sum`, `max`, `min`, `mean` and `median`
+- variance: `var`
+- standard deviation: `sd`
+- Interquartile range: `IQR`
+- Median absolute deviation: `mad`
+- the `q`th quantile of variable `x`: `quantile(x, q)`
+
+---
+
+## Summarizing by group
+
+
+```r
+trafficSum
+```
+
+```
+# A tibble: 37 x 7
+  `machine name` speedMed sizeMed speedHigh  speedLow sizeHigh
+           &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1         animal 2826.361  2070.0  6704.138  990.2539  5189.50
+2         beaker 3100.006  2187.0  7278.133 1190.4486  5700.00
+3           bugs 2363.094  1806.0  6294.699  692.1716  4670.00
+4         bunsen 3399.201  2387.0  8495.322 1198.0713  5747.00
+5           cs17 2470.481  1919.0  6276.665  915.1237  4668.00
+6           cs18 3129.652  1990.5  7147.696 1188.1948  6222.25
+# ... with 31 more rows, and 1 more variables: sizeLow &lt;dbl&gt;
+```
+
+
+---
+
+## Joining
+
+
+```r
+trafficSum &lt;- left_join(trafficSum, 
+                        trafficOrd, 
+                        by = "machine name") %&gt;% 
+  arrange(speedMed)
+```
+
+Here, `right_join`, `inner_join` or `full_join` would give the same.
+
+--
+
+
+```r
+trafficSum
+```
+
+```
+# A tibble: 37 x 8
+  `machine name` speedMed sizeMed speedHigh speedLow sizeHigh
+           &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1           cs20 2205.236    2301  5921.257 698.2296     6691
+2           bugs 2363.094    1806  6294.699 692.1716     4670
+3           cs17 2470.481    1919  6276.665 915.1237     4668
+4          pluto 2496.645    2069  6200.783 862.3327     6006
+5           cs21 2543.163    2067  6386.004 875.2455     6238
+6           cs19 2612.308    2023  6688.195 920.4361     6470
+# ... with 31 more rows, and 2 more variables: sizeLow &lt;dbl&gt;, n &lt;int&gt;
+```
+
+
+---
+
+## A scatter plot
+
+
+```r
+p &lt;- ggplot(trafficSum, aes(x = speedMed, y = sizeMed)) + 
+  geom_point()  ## This geom constructs scatter plots
+p  ## Evaluate p to get the figure drawn
+```
+
+&lt;img src="workData_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Adding aesthetics
+
+
+```r
+p &lt;- p + aes(size = n)
+p
+```
+
+&lt;img src="workData_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Adding a regression line
+
+
+```r
+p &lt;- p + geom_smooth(
+  method = "lm",  ## Default is a scatter plot smoother
+  show.legend = FALSE)  ## Don't mess up the legend
+p
+```
+
+&lt;img src="workData_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Adding a smooth curve
+
+
+```r
+p + geom_smooth(show.legend = FALSE, 
+                se = FALSE, 
+                color = "red") 
+```
+
+```
+`geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="workData_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Adding a line range 
+
+
+```r
+p + geom_linerange(aes(x = speedMed, 
+                       ymin = sizeLow, 
+                       ymax = sizeHigh), 
+                   inherit.aes = FALSE)
+```
+
+&lt;img src="workData_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Stratification using facets
+
+
+```r
+p &lt;- traffic %&gt;% 
+  filter(`machine name` %in% trafficSum$`machine name`[1:12]) %&gt;% 
+  ggplot(aes(x = size, y = time)) +
+  geom_smooth() + 
+* facet_wrap(~ `machine name`)  + 
+  scale_x_log10() + 
+  scale_y_log10()
+```
+
+Multiple things happen here all chained together by ` %&gt;% ` or ` + `. 
+
+--
+
+The filtering selects the 12 "slowest" machines, the `facet_wrap` constructs a 
+plot for each of those machines. 
+
+--
+
+The use of `$` extracts a column of the tibble.
+
+--
+
+The notation `1:12` generates the number sequence `1, 2, ..., 12`.
+
+---
+
+## Stratification using facets
+
+&lt;img src="workData_files/figure-html/facets-1.png" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"navigation": {
+"scroll": false,
+"touch": true
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
