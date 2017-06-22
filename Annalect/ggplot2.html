@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graphics with ggplot2</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Nina Munkholt Jakobsen" />
+    <meta name="date" content="2017-06-22" />
+    <link href="ggplot2_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Graphics with ggplot2
+### Nina Munkholt Jakobsen
+### June 22, 2017
+
+---
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+## ggplot2: Some basic building blocks
+
+* Use the `ggplot` function as a starting point, e.g. to specifiy a data set and what should be on the x and y axes.
+
+* Use a `geom_??` to specify which geometrical objects should represent the data, e.g. points, lines and/or bars. 
+
+* Use `aes` to specify how variables from the data set should be mapped to graphical aesthetics, e.g. x and y positions, size, shape, colour and/or fill.
+
+
+```r
+ggplot(data = my_data, mapping = aes(x = my_x, y = my_y)) +
+  geom_point()
+
+ggplot(my_data, aes(x = my_x, y = my_y)) +
+  geom_point()
+
+my_data %&gt;% 
+  ggplot(aes(x = my_x, y = my_y)) +
+  geom_point()
+```
+
+---
+## Reading data
+
+
+```r
+library(tidyverse)
+```
+
+```r
+## Using the readr package
+traffic &lt;- read_csv("http://math.ku.dk/~richard/Annalect/traffic.csv")
+```
+
+```
+Parsed with column specification:
+cols(
+  `machine name` = col_character(),
+  `user id` = col_integer(),
+  size = col_integer(),
+  time = col_double(),
+  date = col_date(format = ""),
+  month = col_character()
+)
+```
+
+```r
+## Remove all downloads of size 0
+traffic &lt;- filter(traffic, size &gt; 0) 
+
+# My favourite machines
+my_machines &lt;- c("cs18", "pluto", "tweetie")
+```
+
+---
+## The data set
+
+Slightly modified version of a classical data set from Boston University on WWW data transfers, collected during the period November 1994 to May 1995 (see also previous slides).
+
+
+```r
+traffic
+```
+
+```
+# A tibble: 290,275 x 6
+  `machine name` `user id`  size     time       date   month
+           &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;date&gt;   &lt;chr&gt;
+1           cs21    239799  2313 0.510395 1995-04-12 1995-04
+2           cs21    100378 83789 0.880251 1995-04-12 1995-04
+3           cs21    318055  1558 0.429576 1995-04-12 1995-04
+4           cs21    841773  1806 0.568182 1995-04-12 1995-04
+5           cs21    763037   718 0.323564 1995-04-12 1995-04
+6           cs21    487965  9461 0.780510 1995-04-12 1995-04
+# ... with 2.903e+05 more rows
+```
+
+---
+## A simple bar chart
+
+```r
+  ggplot(traffic, aes(x = `machine name`)) + 
+  geom_bar()
+```
+
+&lt;img src="ggplot2_files/figure-html/simple_bar-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Flipping the bar chart
+
+```r
+p &lt;- ggplot(traffic, aes(x = `machine name`)) + 
+  geom_bar() +
+  coord_flip()
+p
+```
+
+&lt;img src="ggplot2_files/figure-html/simple_bar_fix-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Ordering the counts
+
+
+```r
+ordered_counts &lt;- count(traffic, `machine name`) %&gt;% 
+  arrange(n)
+
+ordered_counts
+```
+
+```
+# A tibble: 37 x 2
+  `machine name`     n
+           &lt;chr&gt; &lt;int&gt;
+1           cs18  3814
+2           cs20  4764
+3          kanga  5076
+4          pluto  5253
+5         minnie  5450
+6           cs17  5847
+# ... with 31 more rows
+```
+
+---
+## Ordering the bars
+
+
+```r
+p &lt;- p + scale_x_discrete(limit = ordered_counts$`machine name`)
+p
+```
+
+&lt;img src="ggplot2_files/figure-html/ordered_bar-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Adding monthly download counts
+
+
+```r
+p + aes(fill = month)
+```
+
+&lt;img src="ggplot2_files/figure-html/coloured_bar-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Alternative code for the bar chart
+
+```r
+ggplot(traffic, aes(x = `machine name`, fill = month)) + 
+  geom_bar() +
+  coord_flip() +
+  scale_x_discrete(limit = ordered_counts$`machine name`)
+```
+
+&lt;img src="ggplot2_files/figure-html/alternative_bar-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Another bar chart
+
+```r
+p &lt;- traffic %&gt;% 
+  filter(`machine name` %in% my_machines) %&gt;% 
+  ggplot(aes(x = `machine name`, fill = month))
+
+p + geom_bar()
+```
+
+&lt;img src="ggplot2_files/figure-html/simple_bar_sub-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Some other bar chart options
+
+
+```r
+p + geom_bar(position = "dodge") ## Left plot
+p + geom_bar(position = "fill") ## Right right plot
+```
+
+&lt;img src="ggplot2_files/figure-html/bar_options-1.png" width="336" /&gt;&lt;img src="ggplot2_files/figure-html/bar_options-2.png" width="336" /&gt;
+
+---
+## Daily summary data set
+
+
+```r
+daily_traffic &lt;- read_csv("http://math.ku.dk/~richard/Annalect/daily_traffic.csv")
+daily_traffic
+```
+
+```
+# A tibble: 2,622 x 5
+  `machine name`       date dl_count  size_mb total_dl_count
+           &lt;chr&gt;     &lt;date&gt;    &lt;int&gt;    &lt;dbl&gt;          &lt;int&gt;
+1         animal 1995-01-18       21 0.027082             21
+2         animal 1995-01-25        5 0.009908             26
+3         animal 1995-01-26      208 0.498212            234
+4         animal 1995-01-27       22 1.753592            256
+5         animal 1995-01-29       87 0.236319            343
+6         animal 1995-01-30       32 0.025352            375
+# ... with 2,616 more rows
+```
+
+* `dl_count`: Daily number of downloads.
+
+* `size_mb`: Total size of daily downloads.
+
+* `total_dl_count`: Cumulative number of downloads.
+
+---
+## A simple scatter plot
+
+
+```r
+ggplot(daily_traffic, aes(x = date, y = dl_count)) +
+  geom_point() 
+```
+
+&lt;img src="ggplot2_files/figure-html/simple_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Another scatter plot
+
+
+```r
+p &lt;- daily_traffic %&gt;%
+  filter(`machine name` %in% my_machines) %&gt;% 
+  ggplot(aes(x = date, y = dl_count)) +
+  geom_point() 
+p
+```
+
+&lt;img src="ggplot2_files/figure-html/sub_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Plotting on the log-scale
+
+
+```r
+p &lt;- p + scale_y_log10()
+p
+```
+
+&lt;img src="ggplot2_files/figure-html/log_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+* Other transformations are possible as well, e.g. `scale_x_sqrt()`.
+
+---
+## Points coloured by machine
+
+
+```r
+p + aes(colour = `machine name`)
+```
+
+&lt;img src="ggplot2_files/figure-html/colour_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Points shaped by machine
+
+
+```r
+p + aes(colour = `machine name`, shape = `machine name`)
+```
+
+&lt;img src="ggplot2_files/figure-html/shape_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Points increasing with download size
+
+
+```r
+p + aes(size = size_mb)
+```
+
+&lt;img src="ggplot2_files/figure-html/size_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Points coloured by download size
+
+
+```r
+p + aes(size = size_mb, colour = size_mb &gt; 2)
+```
+
+&lt;img src="ggplot2_files/figure-html/large_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Alternative code for scatter plot
+
+
+```r
+daily_traffic %&gt;%
+  filter(`machine name` %in% my_machines) %&gt;% 
+  ggplot(aes(x = date, y = dl_count)) +
+  scale_y_log10() +
+  geom_point(aes(colour = `machine name`, shape = `machine name`))
+```
+
+&lt;img src="ggplot2_files/figure-html/alternative_scatter-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## A (strange) line plot
+
+
+```r
+ggplot(daily_traffic, aes(x = date, y = total_dl_count)) + 
+  geom_line() 
+```
+
+&lt;img src="ggplot2_files/figure-html/simple_line-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## One line for each machine
+
+
+```r
+ggplot(daily_traffic, aes(x = date, y = total_dl_count)) + 
+  geom_line(aes(group = `machine name`)) 
+```
+
+&lt;img src="ggplot2_files/figure-html/black_lines-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## Lines coloured by machine
+
+
+```r
+ggplot(daily_traffic, aes(x = date, y = total_dl_count)) + 
+  geom_line(aes(group = `machine name`, colour = `machine name`)) 
+```
+
+&lt;img src="ggplot2_files/figure-html/coloured_lines-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+---
+## A box plot
+
+
+```r
+filter(daily_traffic, `machine name` %in% my_machines) %&gt;%
+  ggplot(aes(x = `machine name`, y = size_mb)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+&lt;img src="ggplot2_files/figure-html/box_plot-1.png" width="768" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
