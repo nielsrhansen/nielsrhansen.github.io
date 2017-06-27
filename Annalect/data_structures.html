@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data structures and objects</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Nina Munkholt Jakobsen" />
+    <meta name="date" content="2017-06-28" />
+    <link href="data_structures_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data structures and objects
+### Nina Munkholt Jakobsen
+### June 28, 2017
+
+---
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+## Vectors in R
+
+Think of a vector as a column with a number of components. There are two basic types:
+
+* *Atomic vectors:* All components are of the same type, e.g.
+
+  + integers
+  + numbers
+  + logical values
+  + character strings
+
+* *Lists:* May contain components of different types, including components which themselves are lists. 
+
+Atomic vectors and lists are important building blocks of S3 objects.
+
+Many functions in R behave differently depending on the the class of the object that they are applied to. All objects have a **default** class.
+
+---
+## Atomic vectors and subsetting
+
+Example of a vector.
+
+```r
+( my_vector &lt;- c(1.1, 3.2, 90, 67.7, 10) )
+```
+
+```
+[1]  1.1  3.2 90.0 67.7 10.0
+```
+
+Extracting components using `[]`.
+
+```r
+my_vector[1]
+```
+
+```
+[1] 1.1
+```
+
+```r
+my_vector[c(1,4)]
+```
+
+```
+[1]  1.1 67.7
+```
+
+```r
+my_vector[-2]
+```
+
+```
+[1]  1.1 90.0 67.7 10.0
+```
+
+---
+## Atomic vectors and subsetting
+
+
+```r
+my_vector
+```
+
+```
+[1]  1.1  3.2 90.0 67.7 10.0
+```
+
+Extracting components using functions from the dplyr package.
+
+```r
+library(tidyverse)
+```
+
+```r
+first(my_vector)
+```
+
+```
+[1] 1.1
+```
+
+```r
+last(my_vector)
+```
+
+```
+[1] 10
+```
+
+```r
+nth(my_vector, 3)
+```
+
+```
+[1] 90
+```
+
+---
+## Vectors of class **integer**
+
+Example of an integer vector.
+
+```r
+*integer_vector &lt;- 1L:10
+integer_vector
+```
+
+```
+ [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+```r
+class(integer_vector)
+```
+
+```
+[1] "integer"
+```
+
+This is a vector of length ten, i.e. it has ten components.
+
+```r
+length(integer_vector)
+```
+
+```
+[1] 10
+```
+
+---
+## Vectors of class **numeric**
+
+Example of a vector with non-integer values.
+
+```r
+numeric_vector &lt;- seq(0.1, 1, by = 0.1)
+numeric_vector
+```
+
+```
+ [1] 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+```
+
+```r
+class(numeric_vector)
+```
+
+```
+[1] "numeric"
+```
+
+---
+## A tricky (non-)integer vector
+
+Example of a vector with only seemingly integer values (and how to fix it).
+
+
+```r
+x &lt;- c(1, 4, 7, 9)
+class(x)
+```
+
+```
+[1] "numeric"
+```
+
+```r
+x &lt;- c(1L, 4L, 7L, 9L)
+class(x)
+```
+
+```
+[1] "integer"
+```
+
+---
+## Comparison of numerical values
+
+Values in a vector of class numeric are approximate.
+
+```r
+numeric_vector[2:3]
+```
+
+```
+[1] 0.2 0.3
+```
+
+```r
+numeric_vector[2:3] == c(0.2, 0.3)
+```
+
+```
+[1]  TRUE FALSE
+```
+
+Use function `near` from the dplyr package for such pairwise comparisons.
+
+```r
+near(numeric_vector[2:3], c(0.2, 0.3))
+```
+
+```
+[1] TRUE TRUE
+```
+
+---
+## Vectors of class **logical**
+
+Example of a logical vector.
+
+```r
+logical_vector &lt;- integer_vector &gt; 4
+logical_vector
+```
+
+```
+ [1] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+```
+
+```r
+class(logical_vector)
+```
+
+```
+[1] "logical"
+```
+
+How many percent (%) of the components of `integer_vector` are (strictly) larger than 4?
+
+```r
+mean(integer_vector &gt; 4) * 100
+```
+
+```
+[1] 60
+```
+
+---
+## Vectors of class **character**
+
+Example of a character vector.
+
+```r
+character_vector &lt;- c("A", "vector", "of", "length", 6, ".")
+character_vector
+```
+
+```
+[1] "A"      "vector" "of"     "length" "6"      "."     
+```
+
+```r
+class(character_vector)
+```
+
+```
+[1] "character"
+```
+
+```r
+length(character_vector)
+```
+
+```
+[1] 6
+```
+
+* Observe that the number was coerced to a string.
+
+* The **stringr** package (also a tidyverse package, but must be loaded seperately) has many useful functions for working with character strings.
+
+---
+## Vectors of class **factor**
+
+Example of a factor.
+
+```r
+factor_vector &lt;- factor(c("m", "m", "f", "m", "f", 
+                          "m", "f", "f", "f", "m"))
+factor_vector
+```
+
+```
+ [1] m m f m f m f f f m
+Levels: f m
+```
+
+```r
+class(factor_vector)
+```
+
+```
+[1] "factor"
+```
+
+* Might look like a character vector but based on an integer vector.
+
+* Can only take a fixed set of values (default: values present in data).
+
+* Possibility of reordering levels convenient e.g. for plots.
+
+* The **forcats** package (tidyverse, but load seperately) has a lot of useful functionality for working with factors.
+
+---
+## Vectors of class **Date**
+
+Example of a date vector.
+
+```r
+date_vector &lt;- seq(Sys.Date(), length.out = 4, by = "quarter")
+date_vector
+```
+
+```
+[1] "2017-06-28" "2017-09-28" "2017-12-28" "2018-03-28"
+```
+
+```r
+class(date_vector)
+```
+
+```
+[1] "Date"
+```
+
+* Date vectors might also look like character vectors, but they are based on numeric vectors.
+
+* The **lubridate** package (also tidyverse, but load seperately) has many useful functions for working with dates, times, time zones etc.
+
+---
+## Lists
+
+Example of a list (with named elements).
+
+```r
+my_list &lt;- list(my_integers = integer_vector, my_factor = factor_vector,
+                my_logicals = logical_vector, my_dates = date_vector)
+my_list
+```
+
+```
+$my_integers
+ [1]  1  2  3  4  5  6  7  8  9 10
+
+$my_factor
+ [1] m m f m f m f f f m
+Levels: f m
+
+$my_logicals
+ [1] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+
+$my_dates
+[1] "2017-06-28" "2017-09-28" "2017-12-28" "2018-03-28"
+```
+
+```r
+*length(my_list)
+```
+
+```
+[1] 4
+```
+
+---
+## Subsetting lists
+
+Example of a sublist.
+
+```r
+my_first_sublist &lt;- my_list[1:3]
+my_first_sublist
+```
+
+```
+$my_integers
+ [1]  1  2  3  4  5  6  7  8  9 10
+
+$my_factor
+ [1] m m f m f m f f f m
+Levels: f m
+
+$my_logicals
+ [1] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+```
+
+```r
+class(my_first_sublist)
+```
+
+```
+[1] "list"
+```
+
+---
+## Subsetting lists
+
+Example of another sublist.
+
+```r
+my_second_sublist &lt;- my_list[4]
+my_second_sublist 
+```
+
+```
+$my_dates
+[1] "2017-06-28" "2017-09-28" "2017-12-28" "2018-03-28"
+```
+
+```r
+class(my_second_sublist)
+```
+
+```
+[1] "list"
+```
+
+---
+## Subsetting lists
+
+Extracting components from a list.
+
+```r
+dates_from_list &lt;- my_list$my_dates
+dates_from_list
+```
+
+```
+[1] "2017-06-28" "2017-09-28" "2017-12-28" "2018-03-28"
+```
+
+```r
+class(dates_from_list)
+```
+
+```
+[1] "Date"
+```
+
+The original date vector and the one extracted from the list are identical:
+
+```r
+identical(date_vector, dates_from_list)
+```
+
+```
+[1] TRUE
+```
+
+---
+## Tibbles
+
+Example of a tibble.
+
+```r
+( my_tibble &lt;- as_tibble(my_first_sublist) )
+```
+
+```
+# A tibble: 10 x 3
+  my_integers my_factor my_logicals
+        &lt;int&gt;    &lt;fctr&gt;       &lt;lgl&gt;
+1           1         m       FALSE
+2           2         m       FALSE
+3           3         f       FALSE
+4           4         m       FALSE
+5           5         f        TRUE
+6           6         m        TRUE
+# ... with 4 more rows
+```
+
+```r
+class(my_tibble)
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+
+* Why would `as_tibble(my_list)` give an error? Tibbles are built on lists, *but all their columns need to be vectors of the same length*.
+
+---
+## Subsetting tibbles
+
+Extracting one column from a tibble.
+
+```r
+my_tibble$my_integers
+```
+
+```
+ [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+```r
+class(my_tibble$my_integers)
+```
+
+```
+[1] "integer"
+```
+
+---
+## Subsetting tibbles
+
+Extracting multiple columns from a tibble.
+
+```r
+select(my_tibble, my_integers, my_logicals)
+```
+
+```
+# A tibble: 10 x 2
+  my_integers my_logicals
+        &lt;int&gt;       &lt;lgl&gt;
+1           1       FALSE
+2           2       FALSE
+3           3       FALSE
+4           4       FALSE
+5           5        TRUE
+6           6        TRUE
+# ... with 4 more rows
+```
+
+---
+## Subsetting tibbles
+
+Extracting multiple columns from a tibble.
+
+```r
+select(my_tibble, ends_with("s"))
+```
+
+```
+# A tibble: 10 x 2
+  my_integers my_logicals
+        &lt;int&gt;       &lt;lgl&gt;
+1           1       FALSE
+2           2       FALSE
+3           3       FALSE
+4           4       FALSE
+5           5        TRUE
+6           6        TRUE
+# ... with 4 more rows
+```
+
+* The dplyr function `select` can be used for subsetting in many different ways, see e.g. [R4DS](http://r4ds.had.co.nz/transform.html#select-columns-with-select).
+
+---
+## Reading the supermarket data
+
+
+```r
+Supermarket &lt;- read_csv(
+  "http://math.ku.dk/~richard/Annalect/Supermarket.txt",
+    col_types = cols(
+      CatId = col_character(),
+      ItemId = col_character(), 
+*     Week = col_integer()
+    )
+)
+```
+
+```r
+class(Supermarket)
+```
+
+```
+[1] "tbl_df"     "tbl"        "data.frame"
+```
+
+This is a tibble!
+
+---
+## The supermarket data set
+
+
+```r
+Supermarket
+```
+
+```
+# A tibble: 591,208 x 14
+  StoreId        ItemId                   Item  CatId
+    &lt;int&gt;         &lt;chr&gt;                  &lt;chr&gt;  &lt;chr&gt;
+1  101610          4297             GRAPE BLOD 423240
+2  101610          4313            MANGO STYCK 423240
+3  101610      54016392 DANIO JORDGUBB.    DAN 423250
+4  101610      54016460    DANIO HALLON/VANILJ 423250
+5  101610      54016491 DANIO STRACCATELL  DAN 423250
+6  101610 2320664700008 STEKFLÄSK SVÅLFRI SKIV 423210
+# ... with 5.912e+05 more rows, and 10 more variables: Category &lt;chr&gt;,
+#   Week &lt;int&gt;, DirectMarketing &lt;int&gt;, TVMarketing &lt;int&gt;,
+#   FrontPageMarketing &lt;int&gt;, PriceMarketing &lt;int&gt;, DiscountSEK &lt;dbl&gt;,
+#   PriceSEK &lt;dbl&gt;, NormalSale &lt;dbl&gt;, TotalSale &lt;dbl&gt;
+```
+
+```r
+class(Supermarket$Week)
+```
+
+```
+[1] "integer"
+```
+
+---
+## Bar plot with Week as an integer
+
+```r
+Supermarket &lt;- Supermarket %&gt;% 
+  filter(ItemId %in% c("7311170031149", "7311171002704", 
+                       "7311171003510", "7340011391968", 
+                       "7393835042264"))
+  
+ggplot(Supermarket, aes(x = Week, fill = Item)) +
+  geom_bar()
+```
+
+&lt;img src="data_structures_files/figure-html/data_subset-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Bar plot with Week as a factor
+
+
+```r
+Supermarket &lt;- mutate(Supermarket, Week = factor(Week))
+
+class(Supermarket$Week)
+```
+
+```
+[1] "factor"
+```
+
+```r
+ggplot(Supermarket, aes(x = Week, fill = Item)) + 
+  geom_bar()
+```
+
+&lt;img src="data_structures_files/figure-html/data_mutate-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Factor with more levels
+
+```r
+Supermarket &lt;- Supermarket %&gt;% 
+  mutate(Week = factor(Week, levels = 1:13))
+
+ggplot(Supermarket, aes(x = Week, fill = Item)) + 
+  geom_bar() +
+*  scale_x_discrete(drop = FALSE)
+```
+
+&lt;img src="data_structures_files/figure-html/week_factor-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Factor with reordered levels
+
+Strange bar plot, but useful point: Reordering the levels of a factor changes the plotting order.
+
+
+```r
+Supermarket &lt;- Supermarket %&gt;% 
+  mutate(Week = factor(Week, levels = c(10:13, 3:1, 4:9)))
+
+ggplot(Supermarket, aes(x = Week, fill = Item)) + 
+  geom_bar() + scale_x_discrete(drop = FALSE)
+```
+
+&lt;img src="data_structures_files/figure-html/week_reordered-1.png" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

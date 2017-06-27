@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tibbles and dplyr</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <meta name="date" content="2017-06-28" />
+    <link href="tibbles_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <script src="tibbles_files/htmlwidgets-0.8/htmlwidgets.js"></script>
+    <script src="tibbles_files/jquery-1.12.4/jquery.min.js"></script>
+    <script src="tibbles_files/datatables-binding-0.2/datatables.js"></script>
+    <link href="tibbles_files/dt-core-1.10.12/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="tibbles_files/dt-core-1.10.12/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="tibbles_files/dt-core-1.10.12/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tibbles and dplyr
+### Niels Richard Hansen
+### June 28, 2017
+
+---
+
+
+
+
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+
+## Tidy data tables
+
+“Happy families are all alike; every unhappy family is unhappy in its own way.” –– Leo Tolstoy
+
+--
+
+“Tidy datasets are all alike, but every messy dataset is messy in its own way.” –– Hadley Wickham
+
+
+&lt;img src="tidy-1.png" width="750" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Example of a tidy data set
+
+
+```r
+traffic
+```
+
+```
+# A tibble: 290,275 x 4
+  `machine name`  size     time   month
+           &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;   &lt;chr&gt;
+1           cs21  2313 0.510395 1995-04
+2           cs21 83789 0.880251 1995-04
+3           cs21  1558 0.429576 1995-04
+4           cs21  1806 0.568182 1995-04
+5           cs21   718 0.323564 1995-04
+6           cs21  9461 0.780510 1995-04
+# ... with 2.903e+05 more rows
+```
+
+---
+
+## Cross tabulation
+
+
+```r
+cross_tab &lt;- count(traffic, `machine name`, month)
+cross_tab
+```
+
+```
+Source: local data frame [193 x 3]
+Groups: machine name [?]
+
+# A tibble: 193 x 3
+  `machine name`   month     n
+           &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;
+1         animal 1995-01   305
+2         animal 1995-02  2635
+3         animal 1995-03  1542
+4         animal 1995-04  1641
+5         animal 1995-05  1269
+6         beaker 1995-01   972
+# ... with 187 more rows
+```
+
+--
+
+
+```r
+p &lt;- ggplot(cross_tab, aes(x = `machine name`, y = n)) + 
+  geom_col() + 
+  facet_grid(month ~ .) 
+```
+
+---
+
+## A graphical view of the table
+
+&lt;img src="tibbles_files/figure-html/view-1.png" width="768" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Constructing untidy data
+
+
+```r
+cross_tab &lt;- spread(cross_tab, month, n)
+cross_tab
+```
+
+```
+Source: local data frame [37 x 8]
+Groups: machine name [37]
+
+# A tibble: 37 x 8
+  `machine name` `1994-11` `1994-12` `1995-01`
+*          &lt;chr&gt;     &lt;int&gt;     &lt;int&gt;     &lt;int&gt;
+1         animal        NA        NA       305
+2         beaker        NA        NA       972
+3           bugs        NA        NA       399
+4         bunsen        NA        NA       497
+5           cs17       668      1264      1210
+6           cs18       783       878       952
+# ... with 31 more rows, and 4 more variables: `1995-02` &lt;int&gt;,
+#   `1995-03` &lt;int&gt;, `1995-04` &lt;int&gt;, `1995-05` &lt;int&gt;
+```
+
+--
+
+The column names are now different values of the variable `month`, and the entries 
+in the table are the counts. 
+
+---
+
+## Viewing the tabulated data
+
+<div id="htmlwidget-41b68a2658d677f257da" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-41b68a2658d677f257da">{"x":{"filter":"none","data":[["animal","beaker","bugs","bunsen","cs17","cs18","cs19","cs20","cs21","daffy","donald","duey","eeyore","elmer","fozzie","gonzo","goofy","huey","kanga","kermit","luey","mickey","minnie","owl","piggy","piglet","pluto","pooh","porky","rabbit","rolph","rooh","sylvester","taz","tigger","tweetie","yosemite"],[null,null,null,null,668,783,382,12,116,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,1264,878,769,1113,1230,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[305,972,399,497,1210,952,1531,724,942,199,921,496,321,621,634,1196,379,449,169,704,709,605,403,409,606,406,873,584,660,426,828,409,671,290,227,699,608],[2635,3657,3212,2177,799,79,1291,286,1985,2907,3576,4016,4381,2767,4148,2898,2170,3354,1683,3494,3624,4058,2030,3547,2843,4095,2897,3321,2090,2985,3166,3728,3067,2726,3416,2584,3408],[1542,2157,1382,1044,1359,380,1828,306,1629,1223,1433,590,1476,803,3214,791,820,1269,684,1339,1022,2157,521,1021,1643,1674,1483,1457,1063,1633,1670,1624,369,943,1654,1194,824],[1641,3358,2845,3000,529,287,771,1959,1993,2587,3581,1960,1802,1920,5453,1760,2209,1494,2519,2859,1465,2953,1998,1300,3866,4047,null,2767,2373,3583,2327,2328,2388,2423,2366,2399,2128],[1269,1775,2125,390,18,455,201,364,426,748,870,366,132,438,1185,1058,916,401,21,698,142,902,498,7,502,978,null,1124,958,439,68,708,41,371,803,471,599]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>machine name<\/th>\n      <th>1994-11<\/th>\n      <th>1994-12<\/th>\n      <th>1995-01<\/th>\n      <th>1995-02<\/th>\n      <th>1995-03<\/th>\n      <th>1995-04<\/th>\n      <th>1995-05<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"pageLength":8,"lengthChange":false,"info":false,"columnDefs":[{"className":"dt-head-left","targets":"_all"},{"className":"dt-right","targets":[1,2,3,4,5,6,7]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## Converting back to a tidy data table
+
+
+```r
+cross_tab &lt;- gather(cross_tab, key = "month", 
+                    value = "n", 
+                    - `machine name`)  ## It's a minus sign in front of `machine name`
+cross_tab
+```
+
+```
+Source: local data frame [259 x 3]
+Groups: machine name [37]
+
+# A tibble: 259 x 3
+  `machine name`   month     n
+           &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;
+1         animal 1994-11    NA
+2         beaker 1994-11    NA
+3           bugs 1994-11    NA
+4         bunsen 1994-11    NA
+5           cs17 1994-11   668
+6           cs18 1994-11   783
+# ... with 253 more rows
+```
+
+--
+
+Going back and forth using `spread` and `gather` will turn *implicitly* missing
+values into *explicitly* missing values. 
+
+---
+
+## Getting only the complete cases
+
+
+```r
+complete(cross_tab, n) 
+```
+
+```
+Source: local data frame [193 x 3]
+Groups: machine name [37]
+
+# A tibble: 193 x 3
+  `machine name`     n   month
+           &lt;chr&gt; &lt;int&gt;   &lt;chr&gt;
+1         animal   305 1995-01
+2         animal  1269 1995-05
+3         animal  1542 1995-03
+4         animal  1641 1995-04
+5         animal  2635 1995-02
+6         beaker   972 1995-01
+# ... with 187 more rows
+```
+
+--
+
+This gets us back so that there are no missing values. 
+---
+
+## Relational data
+
+
+&lt;img src="relational.png" width="650" style="display: block; margin: auto;" /&gt;
+
+--
+
+Tidy data tables are relational data tables:
+
+Variable = Attribute  
+Observation = Tuple
+
+---
+
+
+## Multiple tables and derived relations
+
+&lt;img src="relationalModel.png" width="750" style="display: block; margin: auto;" /&gt;
+
+Two tables with the same variable (attribute) defines new relations across the 
+tables. 
+
+---
+
+## Another summary table
+
+
+```r
+traffic_size &lt;- group_by(traffic, `machine name`, month) %&gt;% 
+  summarize(sum_size = sum(size))
+```
+
+--
+
+And to get something interesting in a moment ...
+
+
+```r
+cross_tab &lt;- filter(cross_tab, month &lt; "1995-04")
+```
+
+---
+
+## Inner joining
+
+
+&lt;img src="join-inner.png" width="650" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Inner joining
+
+
+```r
+inner_join(traffic_size, cross_tab)
+```
+
+```
+Joining, by = c("machine name", "month")
+```
+
+```
+Source: local data frame [121 x 4]
+Groups: machine name [?]
+
+# A tibble: 121 x 4
+  `machine name`   month sum_size     n
+           &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;
+1         animal 1995-01  3633345   305
+2         animal 1995-02 39750433  2635
+3         animal 1995-03 62801610  1542
+4         beaker 1995-01 17901177   972
+5         beaker 1995-02 38563224  3657
+6         beaker 1995-03 31885674  2157
+# ... with 115 more rows
+```
+---
+
+##  Outer joining
+
+
+&lt;img src="join-outer.png" width="350" style="display: block; margin: auto;" /&gt;
+
+---
+
+##  Left joining
+
+
+```r
+left_join(traffic_size, cross_tab)
+```
+
+```
+Joining, by = c("machine name", "month")
+```
+
+```
+Source: local data frame [193 x 4]
+Groups: machine name [?]
+
+# A tibble: 193 x 4
+  `machine name`   month sum_size     n
+           &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;
+1         animal 1995-01  3633345   305
+2         animal 1995-02 39750433  2635
+3         animal 1995-03 62801610  1542
+4         animal 1995-04 30499677    NA
+5         animal 1995-05 19094797    NA
+6         beaker 1995-01 17901177   972
+# ... with 187 more rows
+```
+
+
+---
+
+
+## Right joining
+
+
+```r
+right_join(traffic_size, cross_tab)
+```
+
+```
+Joining, by = c("machine name", "month")
+```
+
+```
+Source: local data frame [185 x 4]
+Groups: machine name [?]
+
+# A tibble: 185 x 4
+  `machine name`   month sum_size     n
+           &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;
+1         animal 1994-11       NA    NA
+2         beaker 1994-11       NA    NA
+3           bugs 1994-11       NA    NA
+4         bunsen 1994-11       NA    NA
+5           cs17 1994-11 20857172   668
+6           cs18 1994-11 43510689   783
+# ... with 179 more rows
+```
+
+
+---
+
+
+## Full joining
+
+
+```r
+full_join(traffic_size, cross_tab)
+```
+
+```
+Joining, by = c("machine name", "month")
+```
+
+```
+Source: local data frame [257 x 4]
+Groups: machine name [?]
+
+# A tibble: 257 x 4
+  `machine name`   month sum_size     n
+           &lt;chr&gt;   &lt;chr&gt;    &lt;int&gt; &lt;int&gt;
+1         animal 1995-01  3633345   305
+2         animal 1995-02 39750433  2635
+3         animal 1995-03 62801610  1542
+4         animal 1995-04 30499677    NA
+5         animal 1995-05 19094797    NA
+6         beaker 1995-01 17901177   972
+# ... with 251 more rows
+```
+
+---
+
+## Summary
+
+* .large[R and dplyr are **not** replacements of a database]
+
+  - the relational database functionalities are there to support data analysis within R
+
+--
+
+* .large[But dplyr does make it possible to work with a database backend]
+  - run `vignette("databases", package = "dplyr")` in R to read more
+  
+--
+
+* .large[Typically, you want to use `left_join`]
+  - to join additional variables, and thus add value, to a base data set
+
+
+---
+
+## Bonus example
+
+
+```r
+p &lt;- group_by(cross_tab, month) %&gt;% 
+  summarize(month_total = sum(n, na.rm = TRUE)) %&gt;%
+  left_join(cross_tab, .) %&gt;% 
+  ggplot(aes(x = `machine name`, y = n / month_total)) + 
+  geom_col() + 
+  facet_grid(month ~ ., scale = "free_y") +
+  scale_x_discrete("machine", breaks = c()) + 
+  scale_y_continuous("Relative number of downloads by month",
+                     labels = scales::percent)
+```
+
+```
+Joining, by = "month"
+```
+
+---
+## Bonus example
+
+&lt;img src="tibbles_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false,
+"touch": true
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
