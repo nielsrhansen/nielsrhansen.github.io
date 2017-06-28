@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical models in R</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Nina Munkholt Jakobsen" />
+    <meta name="date" content="2017-06-28" />
+    <link href="statistical_models_in_R_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="R-course.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical models in R
+### Nina Munkholt Jakobsen
+### June 28, 2017
+
+---
+
+
+
+
+layout: true
+
+background-image: url(KUlogo.pdf)
+background-size: cover
+background-position: left
+
+---
+## Reading data
+
+
+```r
+library(tidyverse)
+```
+
+```r
+traffic &lt;- 
+  read_csv("http://math.ku.dk/~richard/Annalect/traffic.csv")
+```
+
+* We'll continue to work with last week's internet traffic data set.
+
+* We'll keep only the data for three machines, with the intention of looking at daily download sizes (in MB) and times (in minutes).
+
+```r
+traffic &lt;- traffic %&gt;%
+  filter(`machine name` %in% c("cs18", "fozzie", "piglet")) %&gt;% 
+  group_by(`machine name`, date) %&gt;% 
+  summarize(size = sum(size)/10^6, time = sum(time)/60)
+```
+
+---
+## Plot of time against size
+
+
+```r
+ggplot(traffic, aes(x = size, y = time)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "darkgrey") +
+  geom_point() 
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/scatter-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Linear regression in R
+  
+In R, a simple linear regression of `y` on `x`, both from the data set `my_data`, is specified as follows.
+
+```r
+lm(y ~ x, data = my_data)
+```
+
+For example, we may fit a linear regression model of `time` on `size`.
+
+```r
+mod1 &lt;- lm(time ~ size, data = traffic)
+```
+
+This model is an object of class `lm`, which is built on a list.
+
+```r
+class(mod1)
+```
+
+```
+[1] "lm"
+```
+
+---
+## Model object
+
+The model object contains information about the model. For example, it contains the intercept and slope of the fitted regression line.
+
+Utilizing that the model object is built on a list.
+
+```r
+mod1$coefficients
+```
+
+```
+(Intercept)        size 
+   1.489490    3.000183 
+```
+
+Using the generic function 'coef'.
+
+```r
+coef(mod1)
+```
+
+```
+(Intercept)        size 
+   1.489490    3.000183 
+```
+
+---
+## Model summary
+More information on the model may be viewed in a summarized form.
+  
+
+```r
+summary(mod1)
+```
+
+```
+
+Call:
+lm(formula = time ~ size, data = traffic)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-61.294  -2.397  -1.539   0.580  81.273 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   1.4895     0.7703   1.934   0.0544 .  
+size          3.0002     0.1687  17.784   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 10.45 on 232 degrees of freedom
+Multiple R-squared:  0.5768,	Adjusted R-squared:  0.575 
+F-statistic: 316.3 on 1 and 232 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Fitted values and residuals
+  
+
+&lt;img src="statistical_models_in_R_files/figure-html/plot_fit_res-1.png" style="display: block; margin: auto;" /&gt;
+
+* **Fitted values**: Model predictions of download times for sizes present in the data set.
+
+* **Residuals**: Pairwise differences between observed download times and corresponding fitted values.
+
+* *Observation = fitted value + residual*
+
+---
+## Fitted values and residuals
+  
+* Fitted values and residuals may be extracted using the generic functions `predict` and `residuals`.
+
+* The values can be appended to the data set using the dplyr function `bind_cols`.
+
+```r
+bind_cols(traffic, fit = predict(mod1), res = residuals(mod1))
+```
+
+```
+# A tibble: 234 x 6
+# Groups:   machine name [?]
+  `machine name`       date      size         time       fit        res
+           &lt;chr&gt;     &lt;date&gt;     &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+1           cs18 1994-11-22 22.374257 149.88951093 68.616350  81.273161
+2           cs18 1994-11-23 12.164511  25.64494058 37.985246 -12.340305
+3           cs18 1994-11-24  8.051844   6.48303922 25.646493 -19.163454
+4           cs18 1994-11-25  0.065492   0.30689892  1.685978  -1.379079
+5           cs18 1994-11-28  0.625010   1.68527002  3.364634  -1.679364
+6           cs18 1994-11-29  0.020119   0.05921128  1.549850  -1.490639
+# ... with 228 more rows
+```
+
+---
+## Residuals vs. fitted values (`mod1`)
+  
+
+```r
+tibble(fit = predict(mod1), res = residuals(mod1)) %&gt;% 
+ggplot(aes(x = fit, y = res)) +
+  geom_abline(slope = 0, colour = "darkgrey", linetype = "dashed") +
+  geom_point()
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/mod1_res_fit-1.png" style="display: block; margin: auto;" /&gt;
+
+* Absolute values of the residuals increase with the fitted values. Model not appropriate for the data. Perhaps it might help to log-transform the data?
+
+---
+## Plot of time against size with axes on the log-scale
+  
+
+```r
+ggplot(traffic, aes(x = size, y = time)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "darkgrey") +
+  scale_x_log10() + 
+  scale_y_log10() +
+  geom_point()
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/log_scatter-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## New linear regression model (`mod2`)
+  
+Linear regression model of `log10(time)` on `log10(size)`.
+
+```r
+mod2 &lt;- lm(log10(time) ~ log10(size), data = traffic)
+```
+
+---
+## Residuals vs. fitted values (`mod2`)
+
+```r
+tibble(fit = predict(mod2), res = residuals(mod2)) %&gt;% 
+ggplot(aes(x = fit, y = res)) +
+  geom_abline(slope = 0, colour = "darkgrey", linetype = "dashed") +
+  geom_point()
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/mod2_res_fit-1.png" style="display: block; margin: auto;" /&gt;
+
+* Absolute values of the residuals no longer increase with the fitted values. This model might be more appropriate for the data.
+
+---
+## A more complicated model (`mod3`)
+  
+A linear regression model of `log10(time)` on `log10(size)` with a different line for each machine.
+
+```r
+mod3 &lt;- lm(log10(time) ~ `machine name` * log10(size), data = traffic)
+```
+
+Appending the data set with the fitted values on the original scale.
+
+```r
+*traffic &lt;- bind_cols(traffic, backtransformed_fit = 10^predict(mod3))
+```
+
+---
+## Residuals vs. fitted values (`mod3`)
+  
+
+```r
+bind_cols(traffic, fit = predict(mod3), res = residuals(mod3)) %&gt;% 
+  ggplot(aes(x = fit, y = res, colour = `machine name`)) +
+  geom_abline(slope = 0, colour = "darkgrey", linetype = "dashed") +
+  geom_smooth(se = FALSE) +
+  geom_point()
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/mod3_res_fit-1.png" style="display: block; margin: auto;" /&gt;
+
+* This model might also be ok for the data.
+
+---
+## Illustration of `mod3` and data
+  
+
+```r
+p &lt;- ggplot(traffic, aes(x = size, y = time, colour = `machine name`)) +
+  geom_line(aes(y = backtransformed_fit, group = `machine name`)) +
+  scale_x_log10() + scale_y_log10() +
+  geom_point()
+
+p
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/mod3_plot-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Illustration of `mod3` and data
+  
+
+```r
+p &lt;- p + facet_wrap(~ `machine name`) + theme(legend.position = "none")
+
+p
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/mod3_facet_plots-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Comparing models `mod2` and `mod3`
+
+* The two models are *nested*: Think of the model with one regression line as a "special case" of the model with three regression lines.
+
+* Thus, the two models may be compared using the following statistical test.
+
+```r
+anova(mod2, mod3)
+```
+
+```
+Analysis of Variance Table
+
+Model 1: log10(time) ~ log10(size)
+Model 2: log10(time) ~ `machine name` * log10(size)
+  Res.Df    RSS Df Sum of Sq      F   Pr(&gt;F)    
+1    232 46.317                                 
+2    228 42.150  4     4.167 5.6352 0.000242 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+* Conclusion: There is a significant difference between the two models: p = 0.0002 &lt; 0.05.
+
+---
+## Comparing models `mod2` and `mod3`
+  
+&lt;img src="statistical_models_in_R_files/figure-html/mod3_mod2_facet_plots-1.png" style="display: block; margin: auto;" /&gt;
+
+The plots suggest that the difference which was detected between the two models is not particularly large...
+
+---
+## Predictions on new data (`mod3`)
+  
+
+```r
+new_data &lt;- tibble(`machine name` = c("cs18", "piglet"), 
+                  size = c(10.1, 0.02)) 
+
+new_data &lt;- mutate(new_data, pred = 10^predict(mod3, new_data))
+
+*p + geom_point(aes(y = pred), new_data, colour = 1, shape = 8, size = 3)
+```
+
+&lt;img src="statistical_models_in_R_files/figure-html/predict-1.png" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
