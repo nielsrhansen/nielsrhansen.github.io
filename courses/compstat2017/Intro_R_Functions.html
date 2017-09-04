@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Computational Statistics,   R and Functions</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <link href="Intro_R_Functions_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="Science.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Computational Statistics, <br> R and Functions
+### Niels Richard Hansen
+### September 4, 2017
+
+---
+
+
+---
+## Computational Statistics
+
+--
+**Optimization**
+--
+
+* Continuous model parameters.
+* Meta or tuning parameters.
+* Combinatorial structures, e.g. models.
+
+--
+
+**Integration**
+--
+
+* Mean and variance, `\(E f(X) = \int f(X) \ dP\)`.
+* Probabilities, `\(P(X \in A) = \int_{(X \in A)} \ dP\)`.
+* Marginalization, Bayesian posteriors.
+
+---
+## RStudio 
+
+--
+**Projects**
+--
+
+* Useful for organizing the assignments.
+* Support version control (Git).
+* Easy to use.
+
+--
+
+**R packages**
+--
+
+* Better structure and organization of documentation (Roxygen).
+* More smooth integration with compiled code.
+* More things to learn that are not covered in the course.
+
+---
+## Prerequisites in R 
+
+Good working knowledge of:
+
+* Data structures (vectors, lists, data frames).
+--
+
+* Control structures (loops, if-then-else).
+--
+
+* Function calling.
+--
+
+* Interactive and script usages (`source`) of R.
+--
+
+* You don't need to be an experienced programmer.
+
+---
+## Assignments
+
+The 8 assignments covering 4 topics will form the backbone for the course. Many 
+lectures and practicals will be build around these assignments.
+
+--
+
+You all need to register (in Absalon) for the presentation of 
+one assignment solution. 
+
+--
+
+* Presentations are done in groups of two-three persons. 
+* On four Wednesdays there will be presentations with discussion and feedback.
+* For the exam you need to prepare four *individual* presentations, one for each topic assignment.
+
+
+---
+## Exam
+
+For each of the four topics you choose one out of two assignments to 
+prepare for the exam.
+
+--
+
+* The exam assessment is based on your presentation *on the basis of the 
+entire content of the course*.
+* Get started immediately and work continuously on the assignments as the
+course progresses. 
+
+---
+## R programming 
+
+R functions are fundamental. They don't do anything before they are called and the call is evaluated. 
+--
+
+
+An R function takes a number of *arguments*, and when a function call is evaluated it computes a *return value*.
+
+--
+
+An R program consists of a hierarchy of function calls. When the program is executed, function calls are evaluated and 
+replaced by their return values. 
+
+--
+
+Implementations of R functions are collected into source files, which can be organized into R packages.
+
+--
+
+An R script (or R Markdown document) is a collection of R function calls, which, when evaluated, 
+compute a desired result. 
+
+--
+
+R programming includes activities at many different levels of sophistication and abstraction.
+
+---
+## R programming
+
+R programming can be  
+
+* writing R scripts (for data analysis), interactively running scripts and building reports or other output.
+--
+
+* writing R functions to ease repetitive tasks (avoid copy-paste), to abstract computations, to improve overview by modularization etc.
+--
+
+* developing R packages to ease distribution, to improve usability and documentation, to clarify dependencies etc.
+
+---
+## Writing an R function
+
+A function that counts the number of zeroes in a vector.
+
+
+```r
+countZero &lt;- function(x) {
+  nr &lt;- 0
+  for(i in seq_along(x)) ## 1:length(x) wrong if length(x) is 0
+    nr &lt;- nr + (x[i] == 0)  ## logical coerced to numeric
+  nr
+}
+```
+
+--
+The implementation works in most programming languages:
+--
+
+* Initialize a counter to be 0.
+* Loop through the elements of the vector.
+* Increment the counter whenever an element equals zero.
+* Return the value of the counter.
+
+---
+## Testing an R function
+
+
+```r
+tests &lt;- list(
+  c(0, 0, 0, 0, 25),
+  c(0, 1, 10, 0, 5, -4, 2.5),
+  c(2, 1, 10),
+  c())  ## Extreme case
+sapply(tests, countZero)
+```
+
+```
+## [1] 4 2 0 0
+```
+
+--
+We can manually inspect that the results are correct, or we can do it programmatically.
+
+
+```r
+all(sapply(tests, countZero) == c(4, 2, 0, 0))
+```
+
+```
+## [1] TRUE
+```
+
+---
+## Writing an R function, version 2
+
+
+```r
+countZero2 &lt;- function(x)
+  sum(x == 0)
+```
+
+--
+Testing:
+
+
+```r
+all(sapply(tests, countZero) == sapply(tests, countZero2))
+```
+
+```
+## [1] TRUE
+```
+
+```r
+identical(
+  sapply(tests, countZero),
+  sapply(tests, countZero2)
+)
+```
+
+```
+## [1] FALSE
+```
+
+---
+## Results are equal but not identical!?
+
+
+```r
+typeof(sapply(tests, countZero))
+```
+
+```
+## [1] "double"
+```
+
+--
+
+```r
+countZero &lt;- function(x) {
+* nr &lt;- 0L   ## counter now of type integer! 
+  for(i in seq_along(x))  
+    nr &lt;- nr + (x[i] == 0)
+  nr
+}
+```
+
+--
+
+```r
+typeof(sapply(tests, countZero))
+```
+
+```
+## [1] "integer"
+```
+
+---
+## Results are now identical
+
+
+```r
+identical(
+  sapply(tests, countZero),
+  sapply(tests, countZero2)
+)
+```
+
+```
+## [1] TRUE
+```
+
+---
+## Vectorized R code
+
+
+```r
+countZero2
+```
+
+```
+## function(x)
+##   sum(x == 0)
+```
+
+
+--
+* The expression `x == 0` tests each entry of the vector `x` for being equal to 0 and returns a vector of logicals.
+--
+
+* The `sum` function computes and returns the sum of all elements in a vector. Logicals are coerced to integers. 
+--
+
+* The vectorized implementation is short but expressive and easy to understand.
+--
+
+* The vectorized computations are performed by compiled code. They are faster to evaluate than R code.  
+--
+
+* Writing vectorized code requires a larger knowledge of R functions.
+
+---
+# Practical Exercise 1
+
+---
+## Functions 
+
+R functions consist of three components.
+
+
+```r
+foo &lt;- function(x) {
+  x^2 + x + 1
+}
+```
+
+* The *body* of the function, which is the code in the function.
+--
+
+* The *argument list* that the function takes.
+--
+
+* The *enclosing environment* where the function was created.
+
+---
+## Functions
+
+
+```r
+body(foo) 
+```
+
+```
+## {
+##     x^2 + x + 1
+## }
+```
+
+```r
+formals(foo)  ## formal argument list
+```
+
+```
+## $x
+```
+
+```r
+environment(foo)  ## enclosing environment
+```
+
+```
+## &lt;environment: R_GlobalEnv&gt;
+```
+
+---
+## Function evaluation
+
+When functions are called the body is evaluated with formal arguments 
+replaced by actual arguments (values).
+
+
+
+```r
+foo(10)  ## body evaluated with x = 10
+```
+
+```
+## [1] 111
+```
+
+--
+The result is the same as: 
+
+
+```r
+{x &lt;- 10;  x^2 + x + 1}
+```
+
+```
+## [1] 111
+```
+
+---
+## Function body
+
+The function components can be manipulated like other R components.
+
+
+```r
+body(foo) &lt;- quote({y*x^2 + x + 1})
+foo  ## new body
+```
+
+```
+## function (x) 
+## {
+##     y * x^2 + x + 1
+## }
+```
+
+--
+The function `quote` prevents R from evaluating the expression 
+`{y*x^2 + x + 1}` and simply returns the unevaluated R expression, 
+which then replaces the body of the function `foo`.
+
+---
+## Function evaluation
+
+What happens when we try to evaluate the new function?
+
+--
+
+```r
+foo(10)
+```
+
+```
+## Error in foo(10): object 'y' not found
+```
+
+```r
+y &lt;- 2  ## y is in the global environment
+foo(10) 
+```
+
+```
+## [1] 211
+```
+
+--
+Variables that are not assigned in the body or are in the list of formal 
+arguments are searched for in the functions *enclosing environment*.
+
+---
+## Changing the enclosing environment
+
+The enclosing environment can be changed, and values can be
+assigned to variables in environments.
+
+
+```r
+environment(foo) &lt;- new.env()
+assign("y", 1, environment(foo))
+foo(10)  ## What is the result and why?
+```
+
+```
+## [1] 111
+```
+
+---
+## Changing the argument list
+
+The argument list can be changed as well.
+
+
+```r
+formals(foo) &lt;- alist(x = , y = )
+foo(10)  ## What will happen?
+```
+
+```
+## Error in foo(10): argument "y" is missing, with no default
+```
+
+```r
+foo(10, 2) ## Better?
+```
+
+```
+## [1] 211
+```
+
+---
+## How functions work in principle
+
+* When a function is called, the actual arguments are matched against the *formal 
+arguments*.
+--
+
+* Expressions in the actual argument list are evaluated in the *calling environment*.
+--
+
+* Then the *body* of the function is evaluated.
+--
+
+* Variables that are not arguments or defined inside the body are searched for 
+in the *enclosing environment*.
+--
+
+* The value of the last expression in the body is returned by the function.
+
+--
+
+
+```r
+foo(10, y^2)
+```
+
+```
+## [1] 411
+```
+
+---
+## Scoping rules
+
+For a variable we distinguish between the *symbol* (the `y`) and its value (`2`, say). 
+The rules for finding the symbol are called *scoping* rules, and R implements *lexical scoping*.
+
+--
+
+Symbols reside in environments, and R searches for a symbol in the environment 
+where the function is *defined* and *not* where it is called.
+
+--
+
+In practice, symbols are recursively searched for by starting in the functions *evaluation 
+environment*, then its *enclosing enviroment* and so on until the empty environment. 
+
+--
+
+For interactive usage lexical scoping can appear strange. Setting "global variables"
+might not always have the "expected effect".
+
+--
+
+The "expectation" is typically a *dynamic scoping* rule, which is difficult to predict
+and reason about as a programmer. 
+
+---
+## Functions as first-class objects
+
+A function is an R language object that can be treated like other objects. 
+It is a so-called *first-class object*. The language can create and 
+manipulate functions during execution.
+
+--
+This means that functions can be arguments.
+
+```r
+head(optim, 6)
+```
+
+```
+##                                                                 
+## 1 function (par, fn, gr = NULL, ..., method = c("Nelder-Mead",  
+## 2     "BFGS", "CG", "L-BFGS-B", "SANN", "Brent"), lower = -Inf, 
+## 3     upper = Inf, control = list(), hessian = FALSE)           
+## 4 {                                                             
+## 5     fn1 &lt;- function(par) fn(par, ...)                         
+## 6     gr1 &lt;- if (!is.null(gr))
+```
+
+---
+## Functions as first-class objects
+
+Functions can be return values, like in the *function operator* `Vectorize`.
+
+--
+
+```
+##                                                                    
+## 1  function (FUN, vectorize.args = arg.names, SIMPLIFY = TRUE,     
+## 2      USE.NAMES = TRUE)                                           
+## 3  {                                                               
+## 4  ...                                                             
+## 17     FUNV &lt;- function() {                                        
+## 18         args &lt;- lapply(as.list(match.call())[-1L],              
+## 19             eval, parent.frame())                               
+## 20 ...                                                             
+## 24         do.call("mapply", c(FUN = FUN, args[dovec],             
+## 25             MoreArgs = list(args[!dovec]), SIMPLIFY = SIMPLIFY, 
+## 26             USE.NAMES = USE.NAMES))                             
+## 27     }                                                           
+## 28     formals(FUNV) &lt;- formals(FUN)                               
+## 29     FUNV
+```
+
+--
+
+Chapters 10-12 in AvdR cover functional programming in R, but will not be dealt with
+systematically in this course.
+
+---
+## Computing on the language
+
+R can extract and compute with its own language constructs. This can be used
+for *metaprogramming*; writing programs that write programs.
+
+--
+
+Some concrete examples of *computing on the language* are in plot functions for label 
+construction, and in `subset` and `lm` for implementing *non-standard evaluation*,
+which circumvents the usual scoping rules. 
+
+--
+
+The formula interface is an example of a *domain 
+specific language* implemented in R for model specification that uses various 
+techniques for computing on the language. 
+
+--
+
+Chapters 13-15 in AvdR cover these techniques in greater detail, but will not be dealt with
+systematically in this course.
+
+---
+## Return values
+
+A function can return any kind of R object either explicitly by a `return` statement or 
+as the value of the last evaluated expression in the body. 
+
+--
+
+Many functions return basic data structures such as a number, a vector, a matrix or a data frame. Some functions return other functions. 
+
+--
+
+Lists can be given a *class label* (`"integrate"` below). This is part of the S3 object system in R, 
+which will be covered next week.
+
+---
+## Return values
+
+Multiple return values that don't fit into the basic data structures can be returned as a list.
+
+
+```r
+integrate(sin, 0, 1)
+```
+
+```
+## 0.4596977 with absolute error &lt; 5.1e-15
+```
+
+```r
+str(integrate(sin, 0, 1))
+```
+
+```
+## List of 5
+##  $ value       : num 0.46
+##  $ abs.error   : num 5.1e-15
+##  $ subdivisions: int 1
+##  $ message     : chr "OK"
+##  $ call        : language integrate(f = sin, lower = 0, upper = 1)
+##  - attr(*, "class")= chr "integrate"
+```
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
