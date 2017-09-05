@@ -56,3 +56,12 @@ pre {
 .large {
   font-size: 150%;
 }
+
+.two-column-left {
+  float: left;
+  width: 47%;
+}
+.two-column-right {
+  float: right;
+  width: 47%;
+}
