@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Density smoothing</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <link href="DensLecture_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="Science.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Density smoothing
+### Niels Richard Hansen
+### September 6, 2017
+
+---
+
+
+---
+## Example, amino acid angles
+
+&lt;img src="Phi-psi.jpg" width="300" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Ramachandran plot {.columns-2}
+
+.two-column-left[
+
+```r
+qplot(phi, psi, data = phipsi) 
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-3-1.png" width="400" height="400" /&gt;
+]
+--
+
+.two-column-right[
+
+```r
+qplot(phi, psi, data = phipsi2)
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-4-1.png" width="400" height="400" /&gt;
+]
+
+---
+## Example, amino acid angles 
+
+
+.two-column-left[
+
+```r
+hist(phipsi$phi, prob = TRUE)
+rug(phipsi$phi)
+```
+
+&lt;img src="DensLecture_files/figure-html/his1-1.png" width="400" height="400" /&gt;
+]
+
+--
+
+.two-column-right[
+
+```r
+hist(phipsi$psi, prob = TRUE)
+rug(phipsi$psi)
+```
+
+&lt;img src="DensLecture_files/figure-html/his2-1.png" width="400" height="400" /&gt;
+]
+---
+## Example, amino acid angles
+
+.two-column-left[
+
+```r
+lines(density(phipsi$phi), 
+      col = "red", lwd = 2)
+```
+
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-5-1.png" width="400" height="400" /&gt;
+]
+--
+
+.two-column-right[
+
+```r
+lines(density(phipsi$psi), 
+      col = "red", lwd = 2)
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-6-1.png" width="400" height="400" /&gt;
+]
+
+---
+## Density estimation
+
+Let `\(f_0\)` denote the unknown density we want to estimate.
+
+* If we fit a parametrized statistical model `\((f_{\theta})_{\theta}\)` to 
+data using the estimator `\(\hat{\theta}\)`, then 
+`\(f_{\hat{\theta}}\)` is an estimate of `\(f_0\)`.
+--
+
+* The histogram is a nonparametric density estimator, `\(\hat{f}\)`, of `\(f_0\)`. 
+--
+
+* We are interested in nonparametric estimators because
+    + we want to compare data with the parametric estimate `\(f_{\hat{\theta}}\)`
+    + we don't known a suitable parametric model
+    + visualization
+
+---
+## Density estimation
+    
+*With four parameters I can fit an elephant, and with five I can make him wiggle his trunk.*
+
+John von Neumann
+
+&lt;div class="small"&gt;
+The Normal-inverse Gaussian distribution has four parameters, the generalised hyperbolic distribution
+is an extension with five, but Neumann was probably thinking more in terms of the 
+spline based expansion in Section 10.3 with four or five suitable basis functions. 
+&lt;/div&gt;
+
+---
+## Density estimation
+
+For a parametric family we can use the MLE
+`$$\hat{\theta} = \mathrm{arg max}_{\theta} \sum_{i=1}^n \log f_{\theta}(x_i).$$`
+
+--
+For nonparametric estimation we can still introduce the log-likelihood:
+`$$\ell(f) = \sum_{i=1}^n \log f(x_i)$$`
+--
+Let's see what happens if 
+`$$f(x) = f_h(x) = \frac{1}{nh \sqrt{2 \pi}} \sum_{j=1}^n e^{- \frac{(x - x_j)^2}{2 h^2} }.$$`
+
+---
+## Density estimation
+
+
+```r
+ffun &lt;- function(x, h) mean(dnorm(x, phipsi$psi, h))
+ffun &lt;- Vectorize(ffun)
+hist(phipsi$psi, prob = TRUE)
+rug(phipsi$psi)
+curve(ffun(x, 1), add = TRUE, col = "red")
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-7-1.png" width="400" height="400" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h = 1\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-8-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h = 0.25\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-9-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h = 0.01\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-10-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h = 0.025\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-11-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h = 0.01\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-12-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Density estimation, \(h \to 0 \)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-13-1.png" width="600" height="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Log-likelihood 
+
+
+First computation:
+
+
+```r
+hseq &lt;- seq(1, 0.001, -0.001)
+ll &lt;- sapply(hseq, function(h) 
+         sum(log(ffun(phipsi$psi, h))))
+```
+
+--
+Alternative, which is faster but more special purpose:
+
+
+```r
+diffsq &lt;- outer(phipsi$psi, phipsi$psi, 
+                function(x, y) (x - y)^2 / 2)
+n &lt;- nrow(phipsi)
+ll2 &lt;- sapply(hseq, function(h) 
+                sum(log(colSums(exp(-diffsq / h^2)))) - 
+                n * log(n * h * sqrt(2 * pi)))
+```
+
+The second implementation reveals the `\(n^2\)`-complexity of the computations 
+by the call to `outer`. 
+
+
+---
+## Log-likelihood 
+
+
+```r
+p1 &lt;- qplot(hseq, ll, geom = "line") + xlab("h")
+p2 &lt;- qplot(hseq, ll, geom = "line") + scale_x_log10("h")
+```
+--
+
+&lt;img src="DensLecture_files/figure-html/pside-1.png" width="800" height="400" /&gt;
+
+---
+## Log-likelihood
+
+If `\(x_i \neq x_j\)` when `\(i \neq j\)`
+$$
+`\begin{aligned}
+\ell(f_h) &amp; = \sum_{i} \log\left(1 + \sum_{j \neq i} e^{-(x_i - x_j)^2 / (2 h^2)} \right) - 
+n \log(nh\sqrt{2 \pi}) \\
+&amp; \sim - n \log(nh\sqrt{2 \pi})
+\end{aligned}`
+$$
+for `\(h \to 0\)`. 
+--
+
+Hence, `\(\ell(f_h) \to \infty\)` for `\(h \to 0\)` and there is no MLE in the set of distributions
+with densities.
+
+
+```r
+asympll &lt;- - n * log(n * hseq * sqrt(2 * pi))
+```
+
+---
+## Log-likelihood 
+
+
+```r
+p1 &lt;- p1 + geom_line(aes(hseq, asympll))
+p2 &lt;- p2 + geom_line(aes(hseq, asympll))
+```
+
+&lt;img src="DensLecture_files/figure-html/pside2-1.png" width="800" height="400" /&gt;
+
+---
+## Log-likelihood
+
+It actually holds that 
+`$$f_h \cdot m \overset{\mathrm{wk}}{\longrightarrow} 
+\varepsilon_n = \frac{1}{n} \sum_{i=1}^n \delta_{x_i}$$`
+for `\(h \to 0\)` (weak convergence). 
+--
+
+
+The *empirical measure* `\(\varepsilon_n\)` can sensibly be regarded as 
+the nonparametric MLE of the distribution. 
+--
+
+
+But the empirical measure does not have a density, and density 
+estimation instead relies on the approximation
+`$$P(X \in (x-h, x+h)) = \int_{x-h}^{x+h} f_0(z) \ dz \simeq f_0(x) 2h.$$`
+
+---
+## Kernels 
+
+We will consider *kernel estimators* 
+`$$\hat{f}_h(x) = \frac{1}{hn} \sum_{i=1}^n K\left(\frac{x - x_i}{h}\right).$$`
+
+--
+The *uniform* or *rectangular kernel* is 
+`$$K(x) = \frac{1}{2} 1_{(-1,1)}(x).$$`
+--
+The *Gaussian kernel* is 
+`$$K(x) = \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}.$$`
+
+
+---
+## ISE, MISE and MSE
+
+Quality of `\(\hat{f}_h\)` can be quantified by the *integrated squared error*,
+`$$\mathrm{ISE}(\hat{f}_h) = \int (\hat{f}_h(x) - f_0(x))^2 \ dx = ||\hat{f}_h - f_0||_2^2.$$` 
+--
+
+
+Quality of the estimation procedure producing `\(\hat{f}_h\)` can be quantified by taking the mean ISE,
+`$$\mathrm{MISE}(h) = E(\mathrm{ISE}(\hat{f}_h)),$$`
+where the expectation integral is over the data.
+--
+
+
+`$$\mathrm{MISE}(h) = \int \mathrm{MSE}_h(x) \ dx$$` 
+where `\(\mathrm{MSE}_h(x) = \mathrm{var}(\hat{f}_h(x)) + (\mathrm{bias}(\hat{f}_h(x)))^2\)`.
+
+
+---
+## AMISE
+
+If `\(K\)` integrates to 1 and is symmetric about 0 it holds that
+
+`$$\mathrm{MISE}(h) = \mathrm{AMISE}(h) + o((nh)^{-1} + h^4)$$`
+
+where the *asymptotic mean integrated squared error* is 
+
+`$$\mathrm{AMISE}(h) = \frac{R(K)}{nh} + \frac{h^4 \sigma^4_K R(f'')}{4}$$`
+with 
+`$$R(g) = \int g(t)^2 \ dt = ||g||_2^2 \quad (\mathrm{squared } \ L_2\mathrm{-norm})$$`
+and `\(\sigma_K^2 = \int t^2 K(t) \ dt.\)`
+
+???
+The derivation of AMISE is presented with a slightly more careful treatment of the error in the Taylor expansion than in the book. It is, however, not completely trivial to rigorously interchange the limit (h -&gt; 0) and the integrations. As a consequence of the AMISE formula it is possible to derive the asymptotically optimal choice of bandwidth. Among several methods discussed in the book (some based on cross validation and some on plug-in estimates using the formula for the optimal h), the Sheather-Jones method is recommended. This is not the default for the density() function in R. The default is a version of Silverman's rule of thumb. 
+
+The slides contain a couple of examples of bivariate density estimates for the dihedral angle data. Bivariate or multivariate density estimation is not really part of the course. 
+
+---
+## Example, amino acid angles
+
+.two-column-left[
+
+```r
+lines(density(phipsi$phi, 
+              bw = "SJ"), 
+      col = "red", lwd = 2)
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-19-1.png" width="400" height="400" /&gt;
+]
+
+.two-column-right[
+
+```r
+lines(density(phipsi$psi, 
+              bw = "SJ"), 
+      col = "red", lwd = 2)
+```
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-20-1.png" width="400" height="400" /&gt;
+]
+
+---
+## Bivariate density 
+
+
+```r
+library(MASS) ## kde2d
+library(KernSmooth) ## bkde2D
+```
+
+
+```r
+denshat &lt;- kde2d(phipsi$phi, phipsi$psi, h = 2, n = 100)
+```
+
+
+```r
+denshat &lt;- data.frame(
+  cbind(denshat$x, 
+        rep(denshat$y, each = length(denshat$x)), 
+        as.vector(denshat$z))
+)
+```
+
+
+---
+## Bivariate density, \(h = 2\)
+
+
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-23-1.png" width="700" height="500" /&gt;
+
+---
+## Bivariate density, \(h = 1\)
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-24-1.png" width="700" height="500" style="display: block; margin: auto;" /&gt;
+
+---
+## Bivariate density, code
+
+
+```r
+colnames(denshat) &lt;- 
+  c("phi", "psi", "dens")
+ggplot(denshat, aes(phi, psi)) +
+  geom_tile(aes(fill = dens), 
+            alpha = 0.5) +
+  geom_contour(aes(z = sqrt(dens))) + 
+  geom_point(data = phipsi, 
+             aes(fill = NULL)) +
+  scale_fill_gradient(low = "white", 
+                      high = "darkblue", 
+                      trans = "sqrt")
+```
+
+---
+## Bivariate density
+
+
+```r
+denshat &lt;- bkde2D(phipsi2[, -1], bandwidth = 0.3, 
+                  gridsize = c(100, 100), 
+                  range.x = list(c(-pi, pi), c(-pi, pi)))
+
+denshat &lt;- data.frame(
+  cbind(denshat$x1, 
+        rep(denshat$x2, each = length(denshat$x1)), 
+        as.vector(denshat$fhat))
+)
+```
+
+---
+## Bivariate density
+
+&lt;img src="DensLecture_files/figure-html/unnamed-chunk-27-1.png" width="700" height="500" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
