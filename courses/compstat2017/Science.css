@@ -57,6 +57,10 @@ pre {
   font-size: 150%;
 }
 
+.small {
+  font-size: 80%;
+}
+
 .two-column-left {
   float: left;
   width: 47%;
