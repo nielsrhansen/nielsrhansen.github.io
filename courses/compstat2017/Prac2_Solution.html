@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Practical Exercise 2   solution</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Niels Richard Hansen" />
+    <meta name="date" content="2017-09-11" />
+    <link href="Prac2_Solution_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="Science.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Practical Exercise 2 <br> solution
+### Niels Richard Hansen
+### September 11, 2017
+
+---
+
+
+
+
+## Updated solution of Exercise 1
+
+
+```r
+myBreaks &lt;- function(x, h = 5) {
+  x &lt;- sort(x)
+  breaks &lt;- xb &lt;- x[1]
+  k &lt;- 1
+  for(i in seq_along(x)[-1]) {
+    if (k &lt; h) {
+      k &lt;- k + 1
+    } else {
+      if (xb &lt; x[i - 1] &amp;&amp; x[i - 1] &lt; x[i]) {
+        xb &lt;- x[i - 1]
+        breaks &lt;- c(breaks, xb)
+        k &lt;- 1
+      }
+    }
+  }
+*  last &lt;- length(breaks)
+*  if(k == min(h, length(x) - 1)) last &lt;- last + 1
+*  breaks[last] &lt;- x[length(x)] 
+  breaks
+}
+```
+
+---
+## Updated solution of Exercise 1
+
+I was made aware that my previous solution was broken when `x` had length 2. 
+
+--
+
+
+```r
+myBreaks(1:2, 1)  ## The broken solution gave 1
+```
+
+```
+[1] 1 2
+```
+
+--
+
+And we define a `myHist` function as in Exercise 1
+
+
+```r
+infrared &lt;- read.table("../../datasets/infrared.dat", header = TRUE)
+F12 &lt;- infrared$F12
+myHist &lt;- function(h, ...) 
+  hist(log(F12), function(x) myBreaks(x, h), ...)
+```
+
+
+---
+## Problem 2.1
+
+
+```r
+myHist(30)
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Problem 2.1, testing
+
+
+```r
+myHist()
+```
+
+```
+Error in myBreaks(x, h): argument "h" is missing, with no default
+```
+
+---
+## Problem 2.1, testing
+
+
+```r
+myHist(h = 5, freq = TRUE) 
+```
+
+```
+Warning in plot.histogram(r, freq = freq1, col = col, border = border,
+angle = angle, : the AREAS in the plot are wrong -- rather use 'freq =
+FALSE'
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Problem 2.1, testing
+
+
+```r
+myHist(h = 0) ## Result depends on implementation of 'myBreaks'
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Problem 2.1, testing
+
+
+```r
+rm(F12)
+```
+
+--
+
+
+```r
+myHist(30)
+```
+
+```
+Error in hist(log(F12), function(x) myBreaks(x, h), ...): object 'F12' not found
+```
+
+
+---
+## Problem 2.2
+
+
+```r
+environment(myHist)
+```
+
+```
+&lt;environment: R_GlobalEnv&gt;
+```
+
+```r
+environment(myHist) &lt;- new.env()
+assign("F12", infrared$F12, environment(myHist))
+```
+
+--
+
+
+```r
+ls()
+```
+
+```
+[1] "infrared" "myBreaks" "myHist"  
+```
+
+--
+
+
+```r
+ls(environment(myHist))
+```
+
+```
+[1] "F12"
+```
+
+---
+## Problem 2.2
+
+
+```r
+myHist(40)
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Problem 2.3 
+
+
+```r
+histFactory &lt;- function(x) {
+  function(h, ...) 
+     hist(x, myBreaks(x, h), ...)
+}
+F12 &lt;- infrared$F12
+myHist2 &lt;- histFactory(log(F12))
+```
+
+---
+## Problem 2.3
+
+
+```r
+myHist2(40)
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Problem 2.3
+
+
+```r
+myHist2 &lt;- histFactory(log(F12))
+rm(F12)
+ls()
+```
+
+```
+[1] "histFactory" "infrared"    "myBreaks"    "myHist"      "myHist2"    
+```
+
+```r
+ls(environment(myHist2))
+```
+
+```
+[1] "x"
+```
+
+---
+## Problem 2.3
+
+
+```r
+myHist2(40)
+```
+
+```
+Error in hist(x, myBreaks(x, h), ...): object 'F12' not found
+```
+
+--
+
+Perhaps surprisingly, a reference to `F12` was still around, and removing `F12` from 
+the global environment resulted in an error.
+
+--
+
+
+```r
+substitute(x, environment(myHist2))
+```
+
+```
+log(F12)
+```
+
+The explantion is that the R expression `log(F12)` was never evaluated. (It
+has nothing to do with the log-transformation.)
+
+---
+## Problem 2.3 tricky point
+
+
+```r
+histFactory &lt;- function(x) {
+* force(x)  ## forces evaluation of argument `x`
+  function(h, ...) 
+     hist(x, myBreaks(x, h), ...)
+}
+F12 &lt;- infrared$F12
+myHist2 &lt;- histFactory(log(F12))
+```
+
+Due to *lazy evaluation* arguments are not evaluated until used. 
+--
+
+
+The value of `F12` is, without `force(x)` as above, not looked up until the first call of `myHist2`. 
+--
+
+
+If `F12` is removed before the first call of `myHist2`, the call will result in an error!
+
+---
+## Problem 2.3
+
+
+```r
+rm(F12)
+myHist2(40)
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Summary
+
+* A function can look up variables in its *enclosing environment*. 
+--
+
+* The enclosing environment is suitable for storing *local variables*. 
+--
+
+* The default enclosing environment is where the function is defined. 
+--
+
+* The global environment (the workspace) is not suitable for *local variables*, and dependence 
+upon *global variables* should be avoided.
+--
+
+* The enclosing environment can be set and populated manually (using `new.env` and `assign`).
+--
+
+* A *function factory* like `histFactory` is a systematic way of creating enclosing environments 
+for local variables.
+
+---
+## Problem 2.4
+
+
+```r
+tmp &lt;- myHist(10, plot = FALSE)
+typeof(tmp)
+```
+
+```
+[1] "list"
+```
+
+```r
+class(tmp)
+```
+
+```
+[1] "histogram"
+```
+
+---
+## Problem 2.4, internal structure
+
+
+```r
+## 'str' gives an overview of the internal structure of an R object 
+str(tmp) 
+```
+
+```
+List of 6
+ $ breaks  : num [1:53] -3 -2.41 -2.21 -1.9 -1.66 ...
+ $ counts  : int [1:52] 11 10 12 12 15 10 19 11 18 10 ...
+ $ density : num [1:52] 0.0298 0.0794 0.0616 0.0808 0.2387 ...
+ $ mids    : num [1:52] -2.7 -2.31 -2.05 -1.78 -1.61 ...
+ $ xname   : chr "log(F12)"
+ $ equidist: logi FALSE
+ - attr(*, "class")= chr "histogram"
+```
+
+---
+## Problem 2.4, plotting
+
+
+```r
+plot(tmp, col = "red") 
+```
+
+&lt;img src="Prac2_Solution_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Problem 2.4, getting help 
+
+You can find documentation for `plot` using e.g. 
+
+
+```r
+?plot
+```
+
+However, this will be uninformative on how an object of class histogram is plotted. Try instead 
+
+
+```r
+?plot.histogram
+```
+
+This will give the documentation for the plot method for objects of class histogram. 
+
+---
+## Return values
+
+Multiple return values that don't fit into one of the basic data structures can be returned as a list.
+
+
+```r
+tmp &lt;- integrate(sin, 0, 1)
+tmp
+```
+
+```
+0.4596977 with absolute error &lt; 5.1e-15
+```
+
+```r
+str(tmp)
+```
+
+```
+List of 5
+ $ value       : num 0.46
+ $ abs.error   : num 5.1e-15
+ $ subdivisions: int 1
+ $ message     : chr "OK"
+ $ call        : language integrate(f = sin, lower = 0, upper = 1)
+ - attr(*, "class")= chr "integrate"
+```
+
+---
+## The return value of `integrate` 
+
+The R function `integrate` returns a list. It has class
+
+
+```r
+class(tmp)
+```
+
+```
+[1] "integrate"
+```
+
+When you ask R to print this object it doesn't just print out all the values in the list. It gives a suitably formatted result as implemented 
+in the print method for objects of class integrate. 
+
+---
+## Printing objects of class integrate 
+
+
+```r
+stats:::print.integrate
+```
+
+```
+function (x, digits = getOption("digits"), ...) 
+{
+    if (x$message == "OK") 
+        cat(format(x$value, digits = digits), " with absolute error &lt; ", 
+            format(x$abs.error, digits = 2L), "\\n", sep = "")
+    else cat("failed with message ", sQuote(x$message), "\\n", 
+        sep = "")
+    invisible(x)
+}
+&lt;bytecode: 0x7f9242664e68&gt;
+&lt;environment: namespace:stats&gt;
+```
+
+The `print.integrate` function is not exported from the stats package. It is in the namespace of the stats package, 
+and to access it directly we use `stats:::`. 
+
+---
+## S3 in two minutes
+
+* S3 classes are standard data structures (typically lists) with *class labels*.
+--
+
+* It is an informal system. There are no checks of object content.
+--
+
+* One defines a *generic* function via `UseMethod`.
+--
+
+* Then *methods* for specific classes are implemented as standard R functions 
+with the naming convention `f.classname` for a method for class `classname` of the function `f`. 
+--
+
+* Widely used to write methods for the generic functions `print`, `plot` and `summary`.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -24,6 +24,10 @@ pre {
   padding-left: 0px;
 }
 
+.mjx-chtml { 
+  font-size: 110% !important; 
+}
+
 .remark-code {
   font-size: 70%;
 }
